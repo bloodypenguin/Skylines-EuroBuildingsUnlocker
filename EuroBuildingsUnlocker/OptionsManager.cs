@@ -59,7 +59,7 @@ namespace EuroBuildingsUnlocker
                 return;
             }
 
-            UILabel modLabel = mods.GetComponentsInChildren<UILabel>().FirstOrDefault(l => l.text.Contains("BlooadyPenguin") || l.text.Contains("EuropeanBuildingsUnlocker"));
+            UILabel modLabel = mods.GetComponentsInChildren<UILabel>().FirstOrDefault(l => l.text.Contains("EuropeanBuildingsUnlocker"));
             if (modLabel == null)
             {
                 //Logger.LogInfo("Can't find label");
