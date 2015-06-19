@@ -25,6 +25,7 @@ namespace EuroBuildingsUnlocker
             _stateBeginLoading = Util.RedirectBeginLoading();
             _stateEndLoading = Util.RedirectEndLoading();
             _nativeLevelName = null;
+            _additionalLevelName = null;
         }
 
         public static void Reset()
@@ -35,6 +36,7 @@ namespace EuroBuildingsUnlocker
             Util.RevertBeginLoading(_stateBeginLoading);
             Util.RevertEndLoading(_stateEndLoading);
             _nativeLevelName = null;
+            _additionalLevelName = null;
         }
 
         private void EndLoading()
@@ -204,9 +206,7 @@ namespace EuroBuildingsUnlocker
         public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
         {
             Debug.Log("EuroBuildingsUnlocker - Loading level");
-            do
-            {
-            } while (!Monitor.TryEnter(Lock, SimulationManager.SYNCHRONIZE_TIMEOUT));
+            Monitor.Enter(Lock);
             try
             {
                 string levelToLoad;

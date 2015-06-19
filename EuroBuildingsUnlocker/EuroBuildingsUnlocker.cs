@@ -1,4 +1,5 @@
-﻿using ICities;
+﻿using ColossalFramework;
+using ICities;
 using UnityEngine;
 
 namespace EuroBuildingsUnlocker
@@ -17,13 +18,12 @@ namespace EuroBuildingsUnlocker
                 UnityEngine.Debug.Log("EuroBuildingsUnlocker - Mod has been already bootstrapped");
                 return;
             }
-
-
-
+            NullifyEnvironmentVariable();
             DuplicateExceptionPreventer.Clear();
             Stubber.SetUp();
             _bootstrapped = true;
         }
+
 
 
         public static void Revert()
@@ -34,6 +34,7 @@ namespace EuroBuildingsUnlocker
                 UnityEngine.Debug.Log("EuroBuildingsUnlocker - Mod hasn't been bootstrapped");
                 return;
             }
+            NullifyEnvironmentVariable();
             Stubber.Reset();
             DuplicateExceptionPreventer.Clear();
             _bootstrapped = false;
@@ -55,6 +56,19 @@ namespace EuroBuildingsUnlocker
         public string Description
         {
             get { return "Unlocks European buildings (growables and ploppables) for all environments & vice versa"; }
+        }
+
+        private static void NullifyEnvironmentVariable()
+        {
+            var simulationManager = Singleton<SimulationManager>.instance;
+            if (simulationManager != null)
+            {
+                var mMetaData = simulationManager.m_metaData;
+                if (mMetaData != null)
+                {
+                    mMetaData.m_environment = null;
+                }
+            }
         }
     }
 
@@ -80,6 +94,7 @@ namespace EuroBuildingsUnlocker
 
         public void OnLevelUnloading()
         {
+
         }
     }
 
