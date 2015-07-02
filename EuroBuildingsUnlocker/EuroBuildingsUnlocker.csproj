@@ -30,11 +30,13 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Detours.cs" />
     <Compile Include="EuroBuildingsUnlocker.cs" />
     <Compile Include="DuplicateExceptionPreventer.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="OptionsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stubber.cs" />
