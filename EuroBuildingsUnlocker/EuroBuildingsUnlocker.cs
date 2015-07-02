@@ -8,14 +8,21 @@ namespace EuroBuildingsUnlocker
     {
         private static bool _bootstrapped;
         public static OptionsManager.ModOptions Options = OptionsManager.ModOptions.None;
-        static GameObject sm_optionsManager;
+       // static GameObject sm_optionsManager;
+        public static bool debug = false;
 
         public static void Bootstrap()
         {
-            UnityEngine.Debug.Log("EuroBuildingsUnlocker - Bootstrap");
+            if (debug)
+            {
+                UnityEngine.Debug.Log("EuroBuildingsUnlocker - Bootstrap");                
+            }
             if (_bootstrapped)
             {
-                UnityEngine.Debug.Log("EuroBuildingsUnlocker - Mod has been already bootstrapped");
+                if (debug)
+                {
+                    UnityEngine.Debug.Log("EuroBuildingsUnlocker - Mod has been already bootstrapped");
+                }
                 return;
             }
             NullifyEnvironmentVariable();
@@ -28,10 +35,16 @@ namespace EuroBuildingsUnlocker
 
         public static void Revert()
         {
-            UnityEngine.Debug.Log("EuroBuildingsUnlocker - Revert");
+            if (debug)
+            {
+                UnityEngine.Debug.Log("EuroBuildingsUnlocker - Revert");
+            }
             if (!_bootstrapped)
             {
-                UnityEngine.Debug.Log("EuroBuildingsUnlocker - Mod hasn't been bootstrapped");
+                if (debug)
+                {
+                    UnityEngine.Debug.Log("EuroBuildingsUnlocker - Mod hasn't been bootstrapped");
+                }
                 return;
             }
             NullifyEnvironmentVariable();
@@ -44,11 +57,13 @@ namespace EuroBuildingsUnlocker
         {
             get
             {
-                if (sm_optionsManager == null)
-                {
-                    sm_optionsManager = new GameObject("EuroBuildingsUnlockerOptionsManager");
-                    sm_optionsManager.AddComponent<OptionsManager>();
-                }
+//                if (sm_optionsManager == null)
+//                {
+//                    sm_optionsManager = new GameObject("EuroBuildingsUnlockerOptionsManager");
+//                    sm_optionsManager.AddComponent<OptionsManager>();
+//                }
+                //TODO(earalov): fix options UI
+                OptionsLoader.LoadOptions();
                 return "EuropeanBuildingsUnlocker";
             }
         }
@@ -77,14 +92,20 @@ namespace EuroBuildingsUnlocker
 
         public void OnCreated(ILoading loading)
         {
-            UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnCreated");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnCreated");
+            }
             EuroBuildingsUnlocker.Bootstrap();
 
         }
 
         public void OnReleased()
         {
-            UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnReleased");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnReleased");
+            }
             EuroBuildingsUnlocker.Revert();
         }
 

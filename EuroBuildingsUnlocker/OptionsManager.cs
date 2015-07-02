@@ -318,12 +318,6 @@ namespace EuroBuildingsUnlocker
             }
         }
 
-        public struct Options
-        {
-            public bool loadNativeGrowables;
-            public bool loadNonNativeGrowables;
-            public bool overrideNativeTraficLights;
-            public bool addCustomAssetsGameObject;
-        }
+
     }
 }

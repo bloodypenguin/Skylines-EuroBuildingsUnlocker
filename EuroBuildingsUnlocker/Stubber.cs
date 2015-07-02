@@ -18,7 +18,10 @@ namespace EuroBuildingsUnlocker
 
         public static void SetUp()
         {
-            Debug.Log("EuroBuildingsUnlocker - SetUp");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - SetUp");
+            }
 
             _stateInitPrefabImpl = Util.RedirectInitPrefab();
             _stateLoadLevel = Util.RedirectLoadLevelAdditiveAsync();
@@ -30,7 +33,10 @@ namespace EuroBuildingsUnlocker
 
         public static void Reset()
         {
-            Debug.Log("EuroBuildingsUnlocker - Reset");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - Reset");
+            }
             Util.RevertLoadLevelAdditiveAsync(_stateLoadLevel);
             Util.RevertInitPrefab(_stateInitPrefabImpl);
             Util.RevertBeginLoading(_stateBeginLoading);
@@ -41,16 +47,25 @@ namespace EuroBuildingsUnlocker
 
         private void EndLoading()
         {
-            Debug.Log("EuroBuildingsUnlocker - EndLoading");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - EndLoading");
+            }
         }
 
         private void BeginLoading(string levelName)
         {
-            Debug.Log(String.Format("EuroBuildingsUnlocker - BeginLoading: level '{0}'", levelName));
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log(String.Format("EuroBuildingsUnlocker - BeginLoading: level '{0}'", levelName));
+            }
             try
             {
                 var env = Util.GetEnv();
-                Debug.Log(String.Format("EuroBuildingsUnlocker - Environment is '{0}'", env));
+                if (EuroBuildingsUnlocker.debug)
+                {
+                    Debug.Log(String.Format("EuroBuildingsUnlocker - Environment is '{0}'", env));
+                }
                 if (env == null)
                 {
                     return;
@@ -60,7 +75,11 @@ namespace EuroBuildingsUnlocker
                     return;
                 }
                 _nativeLevelName = env + "Prefabs";
-                Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load native level '{0}'", _nativeLevelName));
+                if (EuroBuildingsUnlocker.debug)
+                {
+                    Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load native level '{0}'",
+                        _nativeLevelName));
+                }
                 Application.LoadLevelAdditive(_nativeLevelName);
             }
             catch (Exception e)
@@ -85,7 +104,13 @@ namespace EuroBuildingsUnlocker
 
         private static void InitializePrefabImpl(string collection, PrefabInfo prefab, string replace)
         {
-            Debug.Log(String.Format("EuroBuildingsUnlocker - Initializing prefab: collection '{0}', prefab '{1}', replace '{2}'", collection, prefab.name, replace));
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log(
+                    String.Format(
+                        "EuroBuildingsUnlocker - Initializing prefab: collection '{0}', prefab '{1}', replace '{2}'",
+                        collection, prefab.name, replace));
+            }
             try
             {
                 if (!String.IsNullOrEmpty(replace))
@@ -93,8 +118,12 @@ namespace EuroBuildingsUnlocker
                     if ((_nativeLevelName != "EuropePrefabs" && (collection == "Europe Beautification")) ||
                         (_nativeLevelName == "EuropePrefabs" && (collection == "Tropical Beautification" || collection == "Sunny Beautification" || collection == "North Beautification")))
                     {
-                        Debug.Log(String.Format(
-                            "EuroBuildingsUnlocker - Prevented replacement of prefab '{0}' with prefab '{1}'", replace, prefab.name));
+                        if (EuroBuildingsUnlocker.debug)
+                        {
+                            Debug.Log(String.Format(
+                                "EuroBuildingsUnlocker - Prevented replacement of prefab '{0}' with prefab '{1}'",
+                                replace, prefab.name));
+                        }
                         replace = String.Empty;
                     }
                 }
@@ -112,16 +141,24 @@ namespace EuroBuildingsUnlocker
                             {
                                 if (_nativeLevelName == "EuropePrefabs" && replaceNativeTrafficLights)
                                 {
-                                    Debug.Log(String.Format(
-                                        "EuroBuildingsUnlocker - Prevented european traffic light '{0}' from loading", prefab.name));
+                                    if (EuroBuildingsUnlocker.debug)
+                                    {
+                                        Debug.Log(String.Format(
+                                            "EuroBuildingsUnlocker - Prevented european traffic light '{0}' from loading",
+                                            prefab.name));
+                                    }
                                     return;
                                 }
                                 else
                                 {
                                     if (_nativeLevelName != "EuropePrefabs" && !replaceNativeTrafficLights)
                                     {
-                                        Debug.Log(String.Format(
-                                            "EuroBuildingsUnlocker - Prevented european traffic light '{0}' from overriding native one", prefab.name));
+                                        if (EuroBuildingsUnlocker.debug)
+                                        {
+                                            Debug.Log(String.Format(
+                                                "EuroBuildingsUnlocker - Prevented european traffic light '{0}' from overriding native one",
+                                                prefab.name));
+                                        }
                                         replace = "";
                                     }
                                 }
@@ -142,8 +179,12 @@ namespace EuroBuildingsUnlocker
                             {
                                 if (_nativeLevelName != "EuropePrefabs" && replaceNativeTrafficLights)
                                 {
-                                    Debug.Log(String.Format(
-                                        "EuroBuildingsUnlocker - Prevented non-european traffic light '{0}' from loading", prefab.name));
+                                    if (EuroBuildingsUnlocker.debug)
+                                    {
+                                        Debug.Log(String.Format(
+                                            "EuroBuildingsUnlocker - Prevented non-european traffic light '{0}' from loading",
+                                            prefab.name));
+                                    }
                                     return;
                                 }
                                 break;
@@ -159,7 +200,11 @@ namespace EuroBuildingsUnlocker
                          collection == "Europe Residential Low" || collection == "Europe Commercial Low" || collection == "Europe Industrial" ||
                          collection == "Europe Office")))
                     {
-                        Debug.Log(String.Format("EuroBuildingsUnlocker - Disabled native growable building '{0}", prefab.name));
+                        if (EuroBuildingsUnlocker.debug)
+                        {
+                            Debug.Log(String.Format("EuroBuildingsUnlocker - Disabled native growable building '{0}",
+                                prefab.name));
+                        }
                         return;
 
                     }
@@ -174,7 +219,11 @@ namespace EuroBuildingsUnlocker
                         collection == "Residential Low" || collection == "Commercial Low" || collection == "Industrial" ||
                          collection == "Office")))
                     {
-                        Debug.Log(String.Format("EuroBuildingsUnlocker - Disabled non-native growable building '{0}", prefab.name));
+                        if (EuroBuildingsUnlocker.debug)
+                        {
+                            Debug.Log(String.Format(
+                                "EuroBuildingsUnlocker - Disabled non-native growable building '{0}", prefab.name));
+                        }
                         return;
 
                     }
@@ -182,7 +231,10 @@ namespace EuroBuildingsUnlocker
                 }
                 if (!DuplicateExceptionPreventer.InitializePrefabImpl(collection, prefab, replace))
                 {
-                    Debug.Log("EuroBuildingsUnlocker - The prefab is a duplicate and will be ignored");
+                    if (EuroBuildingsUnlocker.debug)
+                    {
+                        Debug.Log("EuroBuildingsUnlocker - The prefab is a duplicate and will be ignored");
+                    }
                     return;
                 }
                 Util.RevertInitPrefab(_stateInitPrefabImpl);
@@ -205,7 +257,10 @@ namespace EuroBuildingsUnlocker
 
         public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
         {
-            Debug.Log("EuroBuildingsUnlocker - Loading level");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - Loading level");
+            }
             Monitor.Enter(Lock);
             try
             {
@@ -216,10 +271,17 @@ namespace EuroBuildingsUnlocker
                 }
                 else
                 {
-                    Debug.Log(String.Format("EuroBuildingsUnlocker - Loading native level: '{0}'", levelName));
+                    if (EuroBuildingsUnlocker.debug)
+                    {
+                        Debug.Log(String.Format("EuroBuildingsUnlocker - Loading native level: '{0}'", levelName));
+                    }
                     _additionalLevelName = Util.GetEnv() == "Europe" ? "TropicalPrefabs" : "EuropePrefabs";
                     levelToLoad = _additionalLevelName;
-                    Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load additional level '{0}'", levelToLoad));
+                    if (EuroBuildingsUnlocker.debug)
+                    {
+                        Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load additional level '{0}'",
+                            levelToLoad));
+                    }
                 }
                 Util.RevertLoadLevelAdditiveAsync(_stateLoadLevel);
                 var result = Application.LoadLevelAdditiveAsync(levelToLoad);
