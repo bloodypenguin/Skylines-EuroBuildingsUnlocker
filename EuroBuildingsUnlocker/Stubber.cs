@@ -128,7 +128,7 @@ namespace EuroBuildingsUnlocker
                     }
                 }
 
-                var replaceNativeTrafficLights = EuroBuildingsUnlocker.Options.IsFlagSet(OptionsManager.ModOptions.OverrideNativeTrafficLights);
+                var replaceNativeTrafficLights = EuroBuildingsUnlocker.Options.IsFlagSet(ModOptions.OverrideNativeTrafficLights);
                 if (collection == "Europe Props")
                 {
                     switch (prefab.name)
@@ -191,7 +191,7 @@ namespace EuroBuildingsUnlocker
                             }
                     }
                 }
-                if (!EuroBuildingsUnlocker.Options.IsFlagSet(OptionsManager.ModOptions.LoadNativeGrowables))
+                if (!EuroBuildingsUnlocker.Options.IsFlagSet(ModOptions.LoadNativeGrowables))
                 {
                     if ((_nativeLevelName != "EuropePrefabs" && (collection == "Residential High" || collection == "Commercial High" ||
                         collection == "Residential Low" || collection == "Commercial Low" || collection == "Industrial" ||
@@ -210,7 +210,7 @@ namespace EuroBuildingsUnlocker
                     }
 
                 }
-                if (!EuroBuildingsUnlocker.Options.IsFlagSet(OptionsManager.ModOptions.LoadNonNativeGrowables))
+                if (!EuroBuildingsUnlocker.Options.IsFlagSet(ModOptions.LoadNonNativeGrowables))
                 {
                     if ((_nativeLevelName != "EuropePrefabs" && (collection == "Europe Residential High" || collection == "Europe Commercial High" ||
                          collection == "Europe Residential Low" || collection == "Europe Commercial Low" || collection == "Europe Industrial" ||

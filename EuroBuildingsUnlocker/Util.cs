@@ -8,7 +8,10 @@ namespace EuroBuildingsUnlocker
     {
         public static RedirectCallsState RedirectLoadLevelAdditiveAsync()
         {
-            Debug.Log("EuroBuildingsUnlocker - RedirectLoadLevelAdditiveAsync");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RedirectLoadLevelAdditiveAsync");
+            }
             return RedirectionHelper.RedirectCalls
                (
                    typeof(Application).GetMethod("LoadLevelAdditiveAsync", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null),
@@ -18,7 +21,10 @@ namespace EuroBuildingsUnlocker
 
         public static void RevertLoadLevelAdditiveAsync(RedirectCallsState stateLoadLevel)
         {
-            Debug.Log("EuroBuildingsUnlocker - RevertLoadLevelAdditiveAsync");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RevertLoadLevelAdditiveAsync");
+            }
             RedirectionHelper.RevertRedirect
                 (
                     typeof(Application).GetMethod("LoadLevelAdditiveAsync", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null),
@@ -29,7 +35,10 @@ namespace EuroBuildingsUnlocker
 
         public static RedirectCallsState RedirectInitPrefab()
         {
-            Debug.Log("EuroBuildingsUnlocker - RedirectInitPrefab");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RedirectInitPrefab");
+            }
             return RedirectionHelper.RedirectCalls
                (
                    typeof(PrefabCollection<>).MakeGenericType(typeof(BuildingInfo))
@@ -40,7 +49,10 @@ namespace EuroBuildingsUnlocker
 
         public static void RevertInitPrefab(RedirectCallsState stateInitPrefabImpl)
         {
-            Debug.Log("EuroBuildingsUnlocker - RevertInitPrefab");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RevertInitPrefab");
+            }
             RedirectionHelper.RevertRedirect
                 (
                     typeof(PrefabCollection<>).MakeGenericType(typeof(BuildingInfo))
@@ -51,7 +63,10 @@ namespace EuroBuildingsUnlocker
 
         public static RedirectCallsState RedirectEndLoading()
         {
-            Debug.Log("EuroBuildingsUnlocker - RedirectEndLoading");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RedirectEndLoading");
+            }
             return RedirectionHelper.RedirectCalls
                 (
                     typeof(LoadingProfiler).GetMethod("EndLoading", BindingFlags.Instance | BindingFlags.Public),
@@ -61,7 +76,10 @@ namespace EuroBuildingsUnlocker
 
         public static void RevertEndLoading(RedirectCallsState stateEndLoading)
         {
-            Debug.Log("EuroBuildingsUnlocker - RevertEndLoading");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RevertEndLoading");
+            }
             RedirectionHelper.RevertRedirect
                 (
                     typeof(LoadingProfiler).GetMethod("EndLoading", BindingFlags.Instance | BindingFlags.Public),
@@ -70,7 +88,10 @@ namespace EuroBuildingsUnlocker
         }
         public static RedirectCallsState RedirectBeginLoading()
         {
-            Debug.Log("EuroBuildingsUnlocker - RedirectBeginLoading");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RedirectBeginLoading");
+            }
             return RedirectionHelper.RedirectCalls
                  (
                      typeof(LoadingProfiler).GetMethod("BeginLoading", BindingFlags.Instance | BindingFlags.Public),
@@ -80,7 +101,10 @@ namespace EuroBuildingsUnlocker
 
         public static void RevertBeginLoading(RedirectCallsState stateBeginLoading)
         {
-            Debug.Log("EuroBuildingsUnlocker - RevertBeginLoading");
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - RevertBeginLoading");
+            }
             RedirectionHelper.RevertRedirect
                 (
                      typeof(LoadingProfiler).GetMethod("BeginLoading", BindingFlags.Instance | BindingFlags.Public),

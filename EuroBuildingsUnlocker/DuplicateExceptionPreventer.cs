@@ -37,7 +37,7 @@ namespace EuroBuildingsUnlocker
             }
             else
             {
-                if (EuroBuildingsUnlocker.Options.IsFlagSet(OptionsManager.ModOptions.AddCustomAssetsGameObject))
+                if (EuroBuildingsUnlocker.Options.IsFlagSet(ModOptions.AddCustomAssetsGameObject))
                 {
                     if (collection == "Custom Assets")
                     {
