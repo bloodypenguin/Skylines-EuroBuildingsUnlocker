@@ -8,9 +8,9 @@ namespace EuroBuildingsUnlocker
     public class EuroBuildingsUnlocker : IUserMod
     {
         private static bool _bootstrapped;
-        public static ModOptions Options = ModOptions.None;
-       // static GameObject sm_optionsManager;
         public static bool debug = false;
+        public static string _nativeLevelName;
+        public static string _additionalLevelName;
 
         private static UICheckBox _nativeCheckBox;
         private static UICheckBox _nonNativeCheckBox;
@@ -29,9 +29,17 @@ namespace EuroBuildingsUnlocker
                 }
                 return;
             }
-            NullifyEnvironmentVariable();
+            Util.NullifyEnvironmentVariable();
             DuplicateExceptionPreventer.Clear();
-            Stubber.SetUp();
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - SetUp");
+            }
+            ApplicationDetour.Deploy();
+            PrefabCollectionDetour.Deploy();
+            LoadingProfilerDetour.Deploy();
+            _nativeLevelName = null;
+            _additionalLevelName = null;
             _bootstrapped = true;
         }
 
@@ -51,18 +59,23 @@ namespace EuroBuildingsUnlocker
                 }
                 return;
             }
-            NullifyEnvironmentVariable();
-            Stubber.Reset();
+            Util.NullifyEnvironmentVariable();
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - Reset");
+            }
+            ApplicationDetour.Revert();
+            PrefabCollectionDetour.Revert();
+            LoadingProfilerDetour.Revert();
+            _nativeLevelName = null;
+            _additionalLevelName = null;
             DuplicateExceptionPreventer.Clear();
             _bootstrapped = false;
         }
 
         public string Name
         {
-            get
-            {
-                return "EuropeanBuildingsUnlocker";
-            }
+            get { return "EuropeanBuildingsUnlocker"; }
         }
 
         public string Description
@@ -73,118 +86,28 @@ namespace EuroBuildingsUnlocker
         public void OnSettingsUI(UIHelperBase helper)
         {
             OptionsLoader.LoadOptions();
-            UIHelperBase group = helper.AddGroup("European Buildings Unlocker Options");
-            _nativeCheckBox = (UICheckBox)group.AddCheckbox("Load native vanilla growables", (Options & ModOptions.LoadNativeGrowables)!=0,
-                (b) =>
-                {
-                    if (!b && !_nonNativeCheckBox.isChecked)
-                    {
-                        _nativeCheckBox.isChecked = true;
-                        return;
-                    }
-                    if (b)
-                    {
-                        Options |= ModOptions.LoadNativeGrowables;
-                    }
-                    else
-                    {
-                        Options &= ~ModOptions.LoadNativeGrowables;
-                    }
-                    OptionsLoader.SaveOptions();
-                });
-            _nonNativeCheckBox = (UICheckBox)group.AddCheckbox("Load non-native vanilla growables", (Options & ModOptions.LoadNonNativeGrowables) != 0,
-                (b) =>
-                {
-                    if (!b && !_nativeCheckBox.isChecked)
-                    {
-                        _nonNativeCheckBox.isChecked = true;
-                        return;
-                    }
-                    if (b)
-                    {
-                        Options |= ModOptions.LoadNonNativeGrowables;
-                    }
-                    else
-                    {
-                        Options &= ~ModOptions.LoadNonNativeGrowables;
-                    }
-                    OptionsLoader.SaveOptions();
-                });
-            group.AddCheckbox("Override native traffic lights", (Options & ModOptions.OverrideNativeTrafficLights) != 0,
-                (b) =>
-                {
-                    if (b)
-                    {
-                        Options |= ModOptions.OverrideNativeTrafficLights;
-                    }
-                    else
-                    {
-                        Options &= ~ModOptions.OverrideNativeTrafficLights;
-                    }
-                    OptionsLoader.SaveOptions();
-                });
-            group.AddCheckbox("Add 'Custom Assets Collection' GameObject (may affect loading time)", (Options & ModOptions.AddCustomAssetsGameObject) != 0,
-                (b) =>
-                {
-                    if (b)
-                    {
-                        Options |= ModOptions.AddCustomAssetsGameObject;
-                    }
-                    else
-                    {
-                        Options &= ~ModOptions.AddCustomAssetsGameObject;
-                    }
-                    OptionsLoader.SaveOptions();
-                });
+            var group = helper.AddGroup("European Buildings Unlocker Options");
+            AddCheckbox("Load native vanilla growables", ModOption.LoadNativeGrowables, group);
+            AddCheckbox("Load non-native vanilla growables", ModOption.LoadNonNativeGrowables, group);
+            AddCheckbox("Override native traffic lights", ModOption.OverrideNativeTrafficLights, group);
         }
 
 
-
-
-        private static void NullifyEnvironmentVariable()
+        private static void AddCheckbox(string text, ModOption flag, UIHelperBase group)
         {
-            var simulationManager = Singleton<SimulationManager>.instance;
-            if (simulationManager != null)
-            {
-                var mMetaData = simulationManager.m_metaData;
-                if (mMetaData != null)
+            group.AddCheckbox(text, OptionsHolder.Options.IsFlagSet(flag),
+                b =>
                 {
-                    mMetaData.m_environment = null;
-                }
-            }
+                    if (b)
+                    {
+                        OptionsHolder.Options |= flag;
+                    }
+                    else
+                    {
+                        OptionsHolder.Options &= ~flag;
+                    }
+                    OptionsLoader.SaveOptions();
+                });
         }
     }
-
-    public class ModLoad : ILoadingExtension
-    {
-
-        public void OnCreated(ILoading loading)
-        {
-            if (EuroBuildingsUnlocker.debug)
-            {
-                UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnCreated");
-            }
-            EuroBuildingsUnlocker.Bootstrap();
-
-        }
-
-        public void OnReleased()
-        {
-            if (EuroBuildingsUnlocker.debug)
-            {
-                UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnReleased");
-            }
-            EuroBuildingsUnlocker.Revert();
-        }
-
-        public void OnLevelLoaded(LoadMode mode)
-        {
-        }
-
-        public void OnLevelUnloading()
-        {
-
-        }
-    }
-
 }

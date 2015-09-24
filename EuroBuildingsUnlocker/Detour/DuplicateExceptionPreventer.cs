@@ -37,47 +37,6 @@ namespace EuroBuildingsUnlocker
             }
             else
             {
-                if (EuroBuildingsUnlocker.Options.IsFlagSet(ModOptions.AddCustomAssetsGameObject))
-                {
-                    if (collection == "Custom Assets")
-                    {
-
-                        if (customAssetsGameObject == null)
-                        {
-                            customAssetsGameObject = new GameObject("Custom Assets Collection");
-
-                            buildingCollection = customAssetsGameObject.AddComponent<BuildingCollection>();
-                            buildingCollection.m_replacedNames = new string[] { };
-                            buildingCollection.m_prefabs = new BuildingInfo[] { };
-
-                            propCollection = customAssetsGameObject.AddComponent<PropCollection>();
-                            propCollection.m_replacedNames = new string[] { };
-                            propCollection.m_prefabs = new PropInfo[] { };
-
-                            treeCollection = customAssetsGameObject.AddComponent<TreeCollection>();
-                            treeCollection.m_replacedNames = new string[] { };
-                            treeCollection.m_prefabs = new TreeInfo[] { };
-                        }
-                        if (prefab is BuildingInfo)
-                        {
-                            var length = buildingCollection.m_prefabs.Length;
-                            Array.Resize(ref buildingCollection.m_prefabs, length + 1);
-                            buildingCollection.m_prefabs[length] = (BuildingInfo)prefab;
-                        } else if (prefab is PropInfo)
-                        {
-                            var length = propCollection.m_prefabs.Length;
-                            Array.Resize(ref propCollection.m_prefabs, length + 1);
-                            propCollection.m_prefabs[length] = (PropInfo)prefab;
-                        } else if (prefab is TreeInfo)
-                        {
-                            var length = treeCollection.m_prefabs.Length;
-                            Array.Resize(ref treeCollection.m_prefabs, length + 1);
-                            treeCollection.m_prefabs[length] = (TreeInfo)prefab;
-                        }
-
-                    }
-                }
-
                 prefabData.Replaced = false;
                 if (name != replace && !m_prefabDict[prefabType].ContainsKey(name))
                 {
