@@ -27,5 +27,21 @@ namespace EuroBuildingsUnlocker
                 }
             }
         }
+
+        public static bool IsPrefabEuropean(string collection)
+        {
+            return (collection == "Europe Residential High" || collection == "Europe Commercial High" ||
+                         collection == "Europe Residential Low" || collection == "Europe Commercial Low" || collection == "Europe Industrial" ||
+                         collection == "Europe Office");
+        }
+
+
+        public static bool IsPrefabInternational(string collection)
+        {
+            return (collection == "Residential High" || collection == "Commercial High" ||
+                    collection == "Residential Low" || collection == "Commercial Low" ||
+                    collection == "Industrial" ||
+                    collection == "Office" || collection == "Extra Buildings");
+        }
     }
 }

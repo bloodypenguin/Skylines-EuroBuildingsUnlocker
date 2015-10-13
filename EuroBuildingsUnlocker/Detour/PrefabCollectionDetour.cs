@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Threading;
 using ColossalFramework;
-using ColossalFramework.Packaging;
 using UnityEngine;
 
 namespace EuroBuildingsUnlocker
@@ -157,12 +155,8 @@ namespace EuroBuildingsUnlocker
                 }
                 if (!OptionsHolder.Options.IsFlagSet(ModOption.LoadNativeGrowables))
                 {
-                    if ((EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" && (collection == "Residential High" || collection == "Commercial High" ||
-                        collection == "Residential Low" || collection == "Commercial Low" || collection == "Industrial" ||
-                         collection == "Office")) ||
-                         (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" && (collection == "Europe Residential High" || collection == "Europe Commercial High" ||
-                         collection == "Europe Residential Low" || collection == "Europe Commercial Low" || collection == "Europe Industrial" ||
-                         collection == "Europe Office")))
+                    if ((EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" && Util.IsPrefabInternational(collection)) ||
+                         (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" && Util.IsPrefabEuropean(collection)))
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
@@ -177,15 +171,13 @@ namespace EuroBuildingsUnlocker
                 if (!OptionsHolder.Options.IsFlagSet(ModOption.LoadNonNativeGrowables))
                 {
                     if ((EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" &&
-                         (((collection == "Europe Residential High" || collection == "Europe Commercial High" ||
-                          collection == "Europe Office") && !EuroBuildingsUnlocker._euroStyleEnabled) ||
+                         ((!EuroBuildingsUnlocker._euroStyleEnabled && 
+                         (collection == "Europe Residential High" || collection == "Europe Commercial High" ||
+                          collection == "Europe Office")) ||
                           collection == "Europe Residential Low" || collection == "Europe Commercial Low" ||
                           collection == "Europe Industrial")) ||
-                        (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" &&
-                         (collection == "Residential High" || collection == "Commercial High" ||
-                          collection == "Residential Low" || collection == "Commercial Low" ||
-                          collection == "Industrial" ||
-                          collection == "Office")))
+                        (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" && Util.IsPrefabInternational(collection)
+                         ))
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
