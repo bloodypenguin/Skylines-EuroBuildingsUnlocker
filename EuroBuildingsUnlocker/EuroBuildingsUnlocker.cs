@@ -1,4 +1,6 @@
-﻿using ColossalFramework;
+﻿using System;
+using ColossalFramework;
+using ColossalFramework.Packaging;
 using ColossalFramework.UI;
 using ICities;
 using UnityEngine;
@@ -8,18 +10,24 @@ namespace EuroBuildingsUnlocker
     public class EuroBuildingsUnlocker : IUserMod
     {
         private static bool _bootstrapped;
-        public static bool debug = false;
+        public static bool debug;
         public static string _nativeLevelName;
         public static string _additionalLevelName;
+        public static bool _euroStyleEnabled;
+
 
         private static UICheckBox _nativeCheckBox;
         private static UICheckBox _nonNativeCheckBox;
+
+
+
+
 
         public static void Bootstrap()
         {
             if (debug)
             {
-                UnityEngine.Debug.Log("EuroBuildingsUnlocker - Bootstrap");                
+                UnityEngine.Debug.Log("EuroBuildingsUnlocker - Bootstrap");
             }
             if (_bootstrapped)
             {
@@ -40,7 +48,17 @@ namespace EuroBuildingsUnlocker
             LoadingProfilerDetour.Deploy();
             _nativeLevelName = null;
             _additionalLevelName = null;
+            try
+            {
+                var europeanStyles = PackageManager.FindAssetByName("System." + DistrictStyle.kEuropeanStyleName);
+                _euroStyleEnabled = (europeanStyles != null && europeanStyles.isEnabled);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
             _bootstrapped = true;
+
         }
 
 

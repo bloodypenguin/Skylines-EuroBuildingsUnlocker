@@ -5,12 +5,14 @@ using UnityEngine;
 
 namespace EuroBuildingsUnlocker
 {
-    public struct OptionsDTO
+    //don't rename this class! it causes errors!
+    public struct Options
     {
         public bool loadNativeGrowables;
         public bool loadNonNativeGrowables;
         public bool overrideNativeTraficLights;
-        public bool addCustomAssetsGameObject;
+        public bool addCustomAssetsGameObject; //deprecated
+        public bool debugOutput;
     }
 
     [Flags]
@@ -32,13 +34,13 @@ namespace EuroBuildingsUnlocker
         public static void LoadOptions()
         {
             OptionsHolder.Options = ModOption.None;
-            OptionsDTO options = new OptionsDTO();
+            Options options = new Options();
             try
             {
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(OptionsDTO));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Options));
                 using (StreamReader streamReader = new StreamReader("CSL-EuroBuildingsUnlocker.xml"))
                 {
-                    options = (OptionsDTO)xmlSerializer.Deserialize(streamReader);
+                    options = (Options)xmlSerializer.Deserialize(streamReader);
                 }
             }
             catch (FileNotFoundException)
@@ -69,6 +71,7 @@ namespace EuroBuildingsUnlocker
             }
             if (options.overrideNativeTraficLights)
                 OptionsHolder.Options |= ModOption.OverrideNativeTrafficLights;
+            EuroBuildingsUnlocker.debug = options.debugOutput;
         }
 
         public static void SaveOptions()
@@ -78,7 +81,7 @@ namespace EuroBuildingsUnlocker
             {
                 throw new Exception("European Buildings Unlocker  - at least one set of growables must be loaded!");
             }
-            OptionsDTO options = new OptionsDTO();
+            Options options = new Options();
             if ((OptionsHolder.Options & ModOption.LoadNativeGrowables)!=0)
             {
                 options.loadNativeGrowables = true;
@@ -91,9 +94,10 @@ namespace EuroBuildingsUnlocker
             {
                 options.overrideNativeTraficLights = true;
             }
+            options.debugOutput = EuroBuildingsUnlocker.debug;
             try
             {
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(OptionsDTO));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(Options));
                 using (StreamWriter streamWriter = new StreamWriter("CSL-EuroBuildingsUnlocker.xml"))
                 {
                     xmlSerializer.Serialize(streamWriter, options);

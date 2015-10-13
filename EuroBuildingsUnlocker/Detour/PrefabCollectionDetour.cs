@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Threading;
 using ColossalFramework;
+using ColossalFramework.Packaging;
 using UnityEngine;
 
 namespace EuroBuildingsUnlocker
@@ -175,12 +176,16 @@ namespace EuroBuildingsUnlocker
                 }
                 if (!OptionsHolder.Options.IsFlagSet(ModOption.LoadNonNativeGrowables))
                 {
-                    if ((EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" && (collection == "Europe Residential High" || collection == "Europe Commercial High" ||
-                         collection == "Europe Residential Low" || collection == "Europe Commercial Low" || collection == "Europe Industrial" ||
-                         collection == "Europe Office")) ||
-                         (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" && (collection == "Residential High" || collection == "Commercial High" ||
-                        collection == "Residential Low" || collection == "Commercial Low" || collection == "Industrial" ||
-                         collection == "Office")))
+                    if ((EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" &&
+                         (((collection == "Europe Residential High" || collection == "Europe Commercial High" ||
+                          collection == "Europe Office") && !EuroBuildingsUnlocker._euroStyleEnabled) ||
+                          collection == "Europe Residential Low" || collection == "Europe Commercial Low" ||
+                          collection == "Europe Industrial")) ||
+                        (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" &&
+                         (collection == "Residential High" || collection == "Commercial High" ||
+                          collection == "Residential Low" || collection == "Commercial Low" ||
+                          collection == "Industrial" ||
+                          collection == "Office")))
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
@@ -190,7 +195,21 @@ namespace EuroBuildingsUnlocker
                         return;
 
                     }
+                }
+                else
+                {
+                    if (EuroBuildingsUnlocker._euroStyleEnabled && (EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" &&
+                     (collection == "Europe Residential Low" || collection == "Europe Commercial Low" ||
+                      collection == "Europe Industrial")))
+                    {
+                        if (EuroBuildingsUnlocker.debug)
+                        {
+                            Debug.Log(String.Format(
+                                "EuroBuildingsUnlocker - Disabled Euro growable building '{0}' because European Style was detected", prefab.name));
+                        }
+                        return;
 
+                    }
                 }
                 if (!DuplicateExceptionPreventer.InitializePrefabImpl(collection, prefab, replace))
                 {
