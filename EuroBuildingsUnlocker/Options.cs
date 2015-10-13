@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace EuroBuildingsUnlocker
 {
-    //don't rename this class! it causes errors!
+    //don't rename this class! it will cause errors!
     public struct Options
     {
         public bool loadNativeGrowables;
