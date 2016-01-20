@@ -1,61 +1,50 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
+using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
 
 namespace EuroBuildingsUnlocker.Detour
 {
+    [TargetType(typeof(AsyncOperation))]
     public class AsyncOperationDetour : AsyncOperation
     {
-        private static RedirectCallsState _state;
-        private static bool _deployed;
         public static AsyncOperation nativelevelOperation = null;
         public static AsyncOperation additionalLevelOperation = null;
         private static readonly object Lock = new object();
-        
+
+        private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
+
         public static void Deploy()
         {
-            if (_deployed)
+            if (_redirects != null)
             {
                 return;
             }
-            try
-            {
-                _state = RedirectionHelper.RedirectCalls(typeof(AsyncOperation).GetMethod("get_isDone"),
-                    typeof(AsyncOperationDetour).GetMethod("get_isDone"));
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
-            }
-
-            _deployed = true;
+            _redirects = RedirectionUtil.RedirectType(typeof(AsyncOperationDetour));
         }
-
-
         public static void Revert()
         {
-            if (!_deployed)
+            if (_redirects == null)
             {
                 return;
             }
-            try
+            foreach (var redirect in _redirects)
             {
-                RedirectionHelper.RevertRedirect(typeof(AsyncOperation).GetMethod("get_isDone"), _state);
+                RedirectionHelper.RevertRedirect(redirect.Key, redirect.Value);
             }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
-            }
-            _deployed = false;
+            _redirects = null;
         }
 
-
+        [RedirectMethod]
         public bool get_isDone()
         {
             Monitor.Enter(Lock);
             try
             {
                 bool result;
+                //TODO(earalov): use low level redirection instead
                 Revert();
                 if (this != nativelevelOperation)
                 {
@@ -88,6 +77,7 @@ namespace EuroBuildingsUnlocker.Detour
             }
             finally
             {
+                //TODO(earalov): use low level redirection instead
                 Deploy();
                 Monitor.Exit(Lock);
             }

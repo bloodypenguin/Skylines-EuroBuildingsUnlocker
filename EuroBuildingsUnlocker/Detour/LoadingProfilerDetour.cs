@@ -1,104 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
 
 namespace EuroBuildingsUnlocker.Detour
 {
+    [TargetType(typeof(LoadingProfiler))]
     public class LoadingProfilerDetour
     {
-        private static RedirectCallsState _stateBeginLoading;
-        private static RedirectCallsState _stateEndLoading;
-        private static bool _deployed;
+        private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
         public static void Deploy()
         {
-            if (_deployed)
+            if (_redirects != null)
             {
                 return;
             }
-            try
-            {
-                RedirectBeginLoading();
-                RedirectEndLoading();
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
-            }
-
-            _deployed = true;
+            _redirects = RedirectionUtil.RedirectType(typeof(LoadingProfilerDetour));
         }
-
-
         public static void Revert()
         {
-            if (!_deployed)
+            if (_redirects == null)
             {
                 return;
             }
-            try
+            foreach (var redirect in _redirects)
             {
-                RevertBeginLoading();
-                RedirectEndLoading();
+                RedirectionHelper.RevertRedirect(redirect.Key, redirect.Value);
             }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
-            }
-            _deployed = false;
+            _redirects = null;
         }
 
-        public static void RedirectEndLoading()
-        {
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log("EuroBuildingsUnlocker - RedirectEndLoading");
-            }
-            _stateEndLoading =  RedirectionHelper.RedirectCalls
-                (
-                    typeof(LoadingProfiler).GetMethod("EndLoading", BindingFlags.Instance | BindingFlags.Public),
-                    typeof(LoadingProfilerDetour).GetMethod("EndLoading", BindingFlags.Instance | BindingFlags.NonPublic)
-                );
-        }
-
-        public static void RevertEndLoading()
-        {
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log("EuroBuildingsUnlocker - RevertEndLoading");
-            }
-            RedirectionHelper.RevertRedirect
-                (
-                    typeof(LoadingProfiler).GetMethod("EndLoading", BindingFlags.Instance | BindingFlags.Public),
-                    _stateEndLoading
-                );
-        }
-        public static void RedirectBeginLoading()
-        {
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log("EuroBuildingsUnlocker - RedirectBeginLoading");
-            }
-            _stateBeginLoading = RedirectionHelper.RedirectCalls
-                 (
-                     typeof(LoadingProfiler).GetMethod("BeginLoading", BindingFlags.Instance | BindingFlags.Public),
-                     typeof(LoadingProfilerDetour).GetMethod("BeginLoading", BindingFlags.Instance | BindingFlags.NonPublic)
-                 );
-        }
-
-        public static void RevertBeginLoading()
-        {
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log("EuroBuildingsUnlocker - RevertBeginLoading");
-            }
-            RedirectionHelper.RevertRedirect
-                (
-                     typeof(LoadingProfiler).GetMethod("BeginLoading", BindingFlags.Instance | BindingFlags.Public),
-                    _stateBeginLoading
-                );
-        }
-
+        [RedirectMethod]
         private void EndLoading()
         {
             if (EuroBuildingsUnlocker.debug)
@@ -107,6 +41,7 @@ namespace EuroBuildingsUnlocker.Detour
             }
         }
 
+        [RedirectMethod]
         private void BeginLoading(string levelName)
         {
             if (EuroBuildingsUnlocker.debug)
@@ -135,8 +70,6 @@ namespace EuroBuildingsUnlocker.Detour
             {
                 Debug.LogException(e);
             }
-
         }
-
     }
 }
