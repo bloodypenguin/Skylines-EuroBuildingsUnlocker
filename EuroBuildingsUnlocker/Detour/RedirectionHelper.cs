@@ -24,9 +24,8 @@ THE SOFTWARE.
 
 using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
-namespace EuroBuildingsUnlocker 
+namespace EuroBuildingsUnlocker.Detour 
 {
 
     public struct RedirectCallsState

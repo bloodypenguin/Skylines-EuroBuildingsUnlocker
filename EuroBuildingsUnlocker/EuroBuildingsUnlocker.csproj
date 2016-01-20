@@ -27,13 +27,14 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Detour\ApplicationDetour.cs" />
+    <Compile Include="Detour\AsyncOperationDetour.cs" />
     <Compile Include="Detour\LoadingProfilerDetour.cs" />
     <Compile Include="Detour\PrefabCollectionDetour.cs" />
     <Compile Include="Detour\RedirectionHelper.cs" />

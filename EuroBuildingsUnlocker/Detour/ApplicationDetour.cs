@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Threading;
 using UnityEngine;
 
-namespace EuroBuildingsUnlocker
+namespace EuroBuildingsUnlocker.Detour
 {
     public class ApplicationDetour
     {
@@ -78,13 +78,14 @@ namespace EuroBuildingsUnlocker
         {
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log("EuroBuildingsUnlocker - Loading level");
+                Debug.Log($"EuroBuildingsUnlocker - Loading level {levelName}");
             }
             Monitor.Enter(Lock);
             try
             {
+                bool isNativeLevel = false;
                 string levelToLoad;
-                if (levelName != EuroBuildingsUnlocker._nativeLevelName)
+                if (levelName != EuroBuildingsUnlocker._nativeLevelName || AsyncOperationDetour.nativelevelOperation !=null)
                 {
                     levelToLoad = levelName;
                 }
@@ -92,20 +93,24 @@ namespace EuroBuildingsUnlocker
                 {
                     if (EuroBuildingsUnlocker.debug)
                     {
-                        Debug.Log(String.Format("EuroBuildingsUnlocker - Loading native level: '{0}'", levelName));
+                        Debug.Log($"EuroBuildingsUnlocker - Loading native level: '{levelName}'");
                     }
                     EuroBuildingsUnlocker._additionalLevelName = Util.GetEnv() == "Europe" ? "TropicalPrefabs" : "EuropePrefabs";
                     levelToLoad = EuroBuildingsUnlocker._additionalLevelName;
                     if (EuroBuildingsUnlocker.debug)
                     {
-                        Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load additional level '{0}'",
-                            levelToLoad));
+                        Debug.Log($"EuroBuildingsUnlocker - It's time to load additional level '{levelToLoad}'");
                     }
+                    isNativeLevel = true;
                 }
-                ApplicationDetour.Revert();
-                var result = Application.LoadLevelAdditiveAsync(levelToLoad);
-                ApplicationDetour.Deploy();
-                return result;
+                Revert();
+                var asyncOperation = Application.LoadLevelAdditiveAsync(levelToLoad);
+                if (isNativeLevel)
+                {
+                    AsyncOperationDetour.nativelevelOperation = asyncOperation;
+                }
+                Deploy();
+                return asyncOperation;
             }
             finally
             {

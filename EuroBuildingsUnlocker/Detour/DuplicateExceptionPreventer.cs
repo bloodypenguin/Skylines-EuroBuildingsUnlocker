@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace EuroBuildingsUnlocker
+namespace EuroBuildingsUnlocker.Detour
 {
     class DuplicateExceptionPreventer
     {
@@ -70,7 +71,7 @@ namespace EuroBuildingsUnlocker
         {
             if (customAssetsGameObject != null)
             {
-                GameObject.DestroyObject(customAssetsGameObject);
+                Object.DestroyObject(customAssetsGameObject);
                 customAssetsGameObject = null;
                 buildingCollection = null;
                 propCollection = null;

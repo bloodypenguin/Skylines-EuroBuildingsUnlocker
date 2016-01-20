@@ -3,7 +3,7 @@ using System.Reflection;
 using ColossalFramework;
 using UnityEngine;
 
-namespace EuroBuildingsUnlocker
+namespace EuroBuildingsUnlocker.Detour
 {
     public class PrefabCollectionDetour
     {
@@ -68,25 +68,20 @@ namespace EuroBuildingsUnlocker
         {
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log(
-                    String.Format(
-                        "EuroBuildingsUnlocker - Initializing prefab: collection '{0}', prefab '{1}', replace '{2}'",
-                        collection, prefab.name, replace));
+                Debug.Log($"EuroBuildingsUnlocker - Initializing prefab: collection '{collection}', prefab '{prefab.name}', replace '{replace}'");
             }
             try
             {
-                if (!String.IsNullOrEmpty(replace))
+                if (!string.IsNullOrEmpty(replace))
                 {
                     if ((EuroBuildingsUnlocker._nativeLevelName != "EuropePrefabs" && (collection == "Europe Beautification")) ||
                         (EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" && (collection == "Tropical Beautification" || collection == "Sunny Beautification" || collection == "North Beautification")))
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
-                            Debug.Log(String.Format(
-                                "EuroBuildingsUnlocker - Prevented replacement of prefab '{0}' with prefab '{1}'",
-                                replace, prefab.name));
+                            Debug.Log($"EuroBuildingsUnlocker - Prevented replacement of prefab '{replace}' with prefab '{prefab.name}'");
                         }
-                        replace = String.Empty;
+                        replace = string.Empty;
                     }
                 }
 
@@ -105,9 +100,7 @@ namespace EuroBuildingsUnlocker
                                 {
                                     if (EuroBuildingsUnlocker.debug)
                                     {
-                                        Debug.Log(String.Format(
-                                            "EuroBuildingsUnlocker - Prevented european traffic light '{0}' from loading",
-                                            prefab.name));
+                                        Debug.Log($"EuroBuildingsUnlocker - Prevented european traffic light '{prefab.name}' from loading");
                                     }
                                     return;
                                 }
@@ -117,9 +110,7 @@ namespace EuroBuildingsUnlocker
                                     {
                                         if (EuroBuildingsUnlocker.debug)
                                         {
-                                            Debug.Log(String.Format(
-                                                "EuroBuildingsUnlocker - Prevented european traffic light '{0}' from overriding native one",
-                                                prefab.name));
+                                            Debug.Log($"EuroBuildingsUnlocker - Prevented european traffic light '{prefab.name}' from overriding native one");
                                         }
                                         replace = "";
                                     }
@@ -143,9 +134,7 @@ namespace EuroBuildingsUnlocker
                                 {
                                     if (EuroBuildingsUnlocker.debug)
                                     {
-                                        Debug.Log(String.Format(
-                                            "EuroBuildingsUnlocker - Prevented non-european traffic light '{0}' from loading",
-                                            prefab.name));
+                                        Debug.Log($"EuroBuildingsUnlocker - Prevented non-european traffic light '{prefab.name}' from loading");
                                     }
                                     return;
                                 }
@@ -160,8 +149,7 @@ namespace EuroBuildingsUnlocker
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
-                            Debug.Log(String.Format("EuroBuildingsUnlocker - Disabled native growable building '{0}",
-                                prefab.name));
+                            Debug.Log($"EuroBuildingsUnlocker - Disabled native growable building '{prefab.name}");
                         }
                         return;
 
@@ -181,8 +169,7 @@ namespace EuroBuildingsUnlocker
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
-                            Debug.Log(String.Format(
-                                "EuroBuildingsUnlocker - Disabled non-native growable building '{0}", prefab.name));
+                            Debug.Log($"EuroBuildingsUnlocker - Disabled non-native growable building '{prefab.name}");
                         }
                         return;
 
@@ -196,8 +183,8 @@ namespace EuroBuildingsUnlocker
                     {
                         if (EuroBuildingsUnlocker.debug)
                         {
-                            Debug.Log(String.Format(
-                                "EuroBuildingsUnlocker - Disabled Euro growable building '{0}' because European Style was detected", prefab.name));
+                            Debug.Log(
+                                $"EuroBuildingsUnlocker - Disabled Euro growable building '{prefab.name}' because European Style was detected");
                         }
                         return;
 

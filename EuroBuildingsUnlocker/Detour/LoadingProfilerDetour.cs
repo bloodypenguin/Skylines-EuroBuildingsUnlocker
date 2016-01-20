@@ -2,7 +2,7 @@
 using System.Reflection;
 using UnityEngine;
 
-namespace EuroBuildingsUnlocker
+namespace EuroBuildingsUnlocker.Detour
 {
     public class LoadingProfilerDetour
     {
@@ -111,14 +111,15 @@ namespace EuroBuildingsUnlocker
         {
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log(String.Format("EuroBuildingsUnlocker - BeginLoading: level '{0}'", levelName));
+                Debug.Log($"EuroBuildingsUnlocker - BeginLoading: level '{levelName}'");
             }
             try
             {
+
                 var env = Util.GetEnv();
                 if (EuroBuildingsUnlocker.debug)
                 {
-                    Debug.Log(String.Format("EuroBuildingsUnlocker - Environment is '{0}'", env));
+                    Debug.Log($"EuroBuildingsUnlocker - Environment is '{env}'");
                 }
                 if (env == null)
                 {
@@ -129,12 +130,6 @@ namespace EuroBuildingsUnlocker
                     return;
                 }
                 EuroBuildingsUnlocker._nativeLevelName = env + "Prefabs";
-                if (EuroBuildingsUnlocker.debug)
-                {
-                    Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load native level '{0}'",
-                        EuroBuildingsUnlocker._nativeLevelName));
-                }
-                Application.LoadLevelAdditive(EuroBuildingsUnlocker._nativeLevelName);
             }
             catch (Exception e)
             {

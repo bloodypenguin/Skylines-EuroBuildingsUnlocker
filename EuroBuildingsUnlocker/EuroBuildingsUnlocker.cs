@@ -2,6 +2,7 @@
 using ColossalFramework;
 using ColossalFramework.Packaging;
 using ColossalFramework.UI;
+using EuroBuildingsUnlocker.Detour;
 using ICities;
 using UnityEngine;
 
@@ -10,18 +11,17 @@ namespace EuroBuildingsUnlocker
     public class EuroBuildingsUnlocker : IUserMod
     {
         private static bool _bootstrapped;
-        public static bool debug;
+#if DEBUG
+        public static bool debug = true;
+#else
+        public static bool debug = false;
+#endif
         public static string _nativeLevelName;
         public static string _additionalLevelName;
         public static bool _euroStyleEnabled;
 
-
         private static UICheckBox _nativeCheckBox;
         private static UICheckBox _nonNativeCheckBox;
-
-
-
-
 
         public static void Bootstrap()
         {
@@ -46,6 +46,7 @@ namespace EuroBuildingsUnlocker
             ApplicationDetour.Deploy();
             PrefabCollectionDetour.Deploy();
             LoadingProfilerDetour.Deploy();
+            AsyncOperationDetour.Deploy();
             _nativeLevelName = null;
             _additionalLevelName = null;
             try
@@ -91,15 +92,9 @@ namespace EuroBuildingsUnlocker
             _bootstrapped = false;
         }
 
-        public string Name
-        {
-            get { return "EuropeanBuildingsUnlocker"; }
-        }
+        public string Name => "EuropeanBuildingsUnlocker";
 
-        public string Description
-        {
-            get { return "Unlocks European buildings (growables and ploppables) for all environments & vice versa"; }
-        }
+        public string Description => "Unlocks European buildings (growables and ploppables) for all environments & vice versa";
 
         public void OnSettingsUI(UIHelperBase helper)
         {
