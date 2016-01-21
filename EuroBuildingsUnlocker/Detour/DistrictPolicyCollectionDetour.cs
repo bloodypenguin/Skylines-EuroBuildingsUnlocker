@@ -7,9 +7,8 @@ using EuroBuildingsUnlocker.Redirection;
 
 namespace EuroBuildingsUnlocker.Detour
 {
-    //TODO(earalov): make sure no overlaps between biomes
-    [TargetType(typeof(CitizenCollection))]
-    public class CitizenCollectionDetour : CitizenCollection
+    [TargetType(typeof(DistrictPolicyCollection))]
+    public class DistrictPolicyCollectionDetour : DistrictPolicyCollection
     {
         private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
@@ -19,7 +18,7 @@ namespace EuroBuildingsUnlocker.Detour
             {
                 return;
             }
-            _redirects = RedirectionUtil.RedirectType(typeof(CitizenCollectionDetour));
+            _redirects = RedirectionUtil.RedirectType(typeof(DistrictPolicyCollectionDetour));
         }
         public static void Revert()
         {
@@ -34,7 +33,6 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
-        private string GameObjectName => gameObject?.name;
         private string ParentName => gameObject?.transform?.parent?.gameObject?.name;
 
         [RedirectMethod]
@@ -45,36 +43,24 @@ namespace EuroBuildingsUnlocker.Detour
             {
                 if (EuroBuildingsUnlocker._nativeLevelName == Constants.EuropeLevel)
                 {
-                    if (GameObjectName != Constants.TropicalBeautification || GameObjectName != Constants.SunnyBeautification)
-                    {
-                        Destroy(this);
-                        return;
-                    }
+                    return; //don't destroy this, because manager will unload policies in such case!
                 }
             }
             else if (ParentName == Constants.EuropeCollections)
             {
-                if (EuroBuildingsUnlocker._nativeLevelName != Constants.EuropeLevel) {
-                    if (GameObjectName != Constants.EuropeBeautification)
-                    {
-                        Destroy(this);
-                        return;
-                    }
-                    if (EuroBuildingsUnlocker._nativeLevelName == Constants.NorthLevel)
-                    {
-                        Destroy(this);
-                        return;
-                    }
+                if (EuroBuildingsUnlocker._nativeLevelName != Constants.EuropeLevel)
+                {
+                    return; //don't destroy this, because manager will unload policies in such case!
                 }
             }
-            Singleton<LoadingManager>.instance.QueueLoadingAction(InitializePrefabs(this.gameObject.name, this.m_prefabs, this.m_replacedNames));
+            Singleton<LoadingManager>.instance.QueueLoadingAction(InitializePolicies(this.gameObject.name, this));
         }
 
         [RedirectReverse]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static IEnumerator InitializePrefabs(string name, CitizenInfo[] prefabs, string[] replaces)
+        private static IEnumerator InitializePolicies(string name, DistrictPolicyCollection collection)
         {
-            UnityEngine.Debug.Log($"{name}-{prefabs}-{(replaces == null ? "Null" : "Nonnull")}");
+            UnityEngine.Debug.Log($"{name}-{collection}");
             return null;
         }
     }

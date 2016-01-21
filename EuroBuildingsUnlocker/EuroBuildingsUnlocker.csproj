@@ -37,9 +37,10 @@
     <Compile Include="Detour\ApplicationDetour.cs" />
     <Compile Include="Detour\AsyncOperationDetour.cs" />
     <Compile Include="Detour\BuildingCollectionDetour.cs" />
+    <Compile Include="Detour\BuildingCommonCollectionDetour.cs" />
     <Compile Include="Detour\ItemClassCollectionDetour.cs" />
-    <Compile Include="Detour\LoadingProfilerDetour.cs" />
     <Compile Include="Detour\EffectCollectionDetour.cs" />
+    <Compile Include="Detour\DistrictPolicyCollectionDetour.cs" />
     <Compile Include="Detour\NetCollectionDetour.cs" />
     <Compile Include="Detour\TransportCollectionDetour.cs" />
     <Compile Include="Detour\TreeCollectionDetour.cs" />

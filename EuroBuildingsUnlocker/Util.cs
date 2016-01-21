@@ -4,13 +4,6 @@ namespace EuroBuildingsUnlocker
 {
     public static class Util
     {
-        public static string GetEnv()
-        {
-            var simulationManager = Singleton<SimulationManager>.instance;
-            var mMetaData = simulationManager?.m_metaData;
-            return mMetaData?.m_environment;
-        }
-
         public static void NullifyEnvironmentVariable()
         {
             var simulationManager = Singleton<SimulationManager>.instance;

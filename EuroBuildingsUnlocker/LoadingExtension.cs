@@ -31,11 +31,9 @@ namespace EuroBuildingsUnlocker
                 Debug.Log("EuroBuildingsUnlocker - SetUp");
             }
             ApplicationDetour.Deploy();
-            LoadingProfilerDetour.Deploy();
             AsyncOperationDetour.Deploy();
             EuroBuildingsUnlocker._nativeLevelName = null;
             EuroBuildingsUnlocker._additionalLevelName = null;
-            //TODO(earalov): add more collections detours
             BuildingCollectionDetour.Deploy();
             PropCollectionDetour.Deploy();
             NetCollectionDetour.Deploy();
@@ -46,6 +44,8 @@ namespace EuroBuildingsUnlocker
             MilestoneCollectionDetour.Deploy();
             ItemClassCollectionDetour.Deploy();
             TreeCollectionDetour.Deploy();
+            DistrictPolicyCollectionDetour.Deploy();
+            BuildingCollectionDetour.Deploy();
             try
             {
                 var europeanStyles = PackageManager.FindAssetByName("System." + DistrictStyle.kEuropeanStyleName);
@@ -79,7 +79,6 @@ namespace EuroBuildingsUnlocker
                 Debug.Log("EuroBuildingsUnlocker - Reset");
             }
             ApplicationDetour.Revert();
-            LoadingProfilerDetour.Revert();
             EuroBuildingsUnlocker._nativeLevelName = null;
             EuroBuildingsUnlocker._additionalLevelName = null;
             BuildingCollectionDetour.Revert();
@@ -92,6 +91,8 @@ namespace EuroBuildingsUnlocker
             MilestoneCollectionDetour.Revert();
             ItemClassCollectionDetour.Revert();
             TreeCollectionDetour.Revert();
+            DistrictPolicyCollectionDetour.Revert();
+            BuildingCollectionDetour.Revert();
             _bootstrapped = false;
         }
     }

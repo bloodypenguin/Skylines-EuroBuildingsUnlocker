@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using ColossalFramework;
 using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
 
@@ -38,16 +39,20 @@ namespace EuroBuildingsUnlocker.Detour
         [RedirectMethod]
         public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
         {
+            Monitor.Enter(Lock);
             if (EuroBuildingsUnlocker.debug)
             {
                 Debug.Log($"EuroBuildingsUnlocker - Loading level {levelName}");
             }
-            Monitor.Enter(Lock);
             try
             {
+                if (EuroBuildingsUnlocker._nativeLevelName == null)
+                {
+                    EuroBuildingsUnlocker._nativeLevelName = GetNativeLevel();
+                }
                 var isNativeLevel = false;
                 string levelToLoad;
-                if (levelName != EuroBuildingsUnlocker._nativeLevelName || AsyncOperationDetour.nativelevelOperation !=null)
+                if (levelName != EuroBuildingsUnlocker._nativeLevelName || AsyncOperationDetour.nativelevelOperation != null)
                 {
                     levelToLoad = levelName;
                 }
@@ -57,7 +62,7 @@ namespace EuroBuildingsUnlocker.Detour
                     {
                         Debug.Log($"EuroBuildingsUnlocker - Loading native level: '{levelName}'");
                     }
-                    EuroBuildingsUnlocker._additionalLevelName = Util.GetEnv() == "Europe" ? "TropicalPrefabs" : "EuropePrefabs";
+                    EuroBuildingsUnlocker._additionalLevelName = EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" ? "TropicalPrefabs" : "EuropePrefabs";
                     levelToLoad = EuroBuildingsUnlocker._additionalLevelName;
                     if (EuroBuildingsUnlocker.debug)
                     {
@@ -80,6 +85,22 @@ namespace EuroBuildingsUnlocker.Detour
                 Deploy();
                 Monitor.Exit(Lock);
             }
+        }
+
+        private static string GetNativeLevel()
+        {
+            var simulationManager = Singleton<SimulationManager>.instance;
+            var mMetaData = simulationManager?.m_metaData;
+            var env = mMetaData?.m_environment;
+            if (env == null)
+            {
+                return null;
+            }
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log($"EuroBuildingsUnlocker - Environment is '{env}'");
+            }
+            return $"{env}Prefabs";
         }
     }
 }

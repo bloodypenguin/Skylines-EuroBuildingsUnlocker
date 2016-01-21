@@ -13,6 +13,7 @@ namespace EuroBuildingsUnlocker.Detour
         public static AsyncOperation nativelevelOperation = null;
         public static AsyncOperation additionalLevelOperation = null;
         private static readonly object Lock = new object();
+        private static RedirectCallsState _tempState;
 
         private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
@@ -37,6 +38,34 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
+
+        private static void RevertTemp()
+        {
+            if (_redirects == null)
+            {
+                return;
+            }
+            foreach (var redirect in _redirects)
+            {
+                _tempState = RedirectionHelper.RevertJumpTo(redirect.Key.MethodHandle.GetFunctionPointer(), redirect.Value);
+                break;
+            }
+        }
+
+        private static void DeployBack()
+        {
+            if (_redirects == null)
+            {
+                return;
+            }
+            foreach (var redirect in _redirects)
+            {
+                RedirectionHelper.RevertJumpTo(redirect.Key.MethodHandle.GetFunctionPointer(), _tempState);
+                break;
+            }
+        }
+
+
         [RedirectMethod]
         public bool get_isDone()
         {
@@ -44,8 +73,7 @@ namespace EuroBuildingsUnlocker.Detour
             try
             {
                 bool result;
-                //TODO(earalov): use low level redirection instead
-                Revert();
+                RevertTemp();
                 if (this != nativelevelOperation)
                 {
                     result = isDone;
@@ -77,8 +105,7 @@ namespace EuroBuildingsUnlocker.Detour
             }
             finally
             {
-                //TODO(earalov): use low level redirection instead
-                Deploy();
+                DeployBack();
                 Monitor.Exit(Lock);
             }
         }

@@ -108,20 +108,21 @@ namespace EuroBuildingsUnlocker.Detour
         //TODO(earalov): filter out redundant European industries when loading non-euro biomes
         private void FixReplaces() //TODO(earalov): it's better to remove them from collections at all
         {
-            if (m_prefabs == null || m_replacedNames == null)
+            if (m_prefabs == null)
             {
-                return;;
+                return;
             }
+            var newPrefabs= new List<BuildingInfo>();
             for (var i = 0; i < m_prefabs.Length; i++)
             {
-                var prefab = m_prefabs[i].name;
-                if (prefab == "Hadron Collider" || prefab == "Medical Center" || prefab == "Crematory" ||
-                    prefab == "Cemetery")
+                var prefabName = m_prefabs[i].name;
+                if (prefabName != "Hadron Collider" && prefabName != "Medical Center" && prefabName != "Crematory" &&
+                    prefabName != "Cemetery")
                 {
-                    m_replacedNames[i] = prefab;
+                    newPrefabs.Add(m_prefabs[i]);
                 }
             }
-
+            m_prefabs = newPrefabs.ToArray();
         }
 
         [RedirectReverse]
