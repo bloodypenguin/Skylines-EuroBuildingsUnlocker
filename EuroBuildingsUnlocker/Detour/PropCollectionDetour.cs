@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using ColossalFramework;
@@ -7,7 +8,6 @@ using EuroBuildingsUnlocker.Redirection;
 
 namespace EuroBuildingsUnlocker.Detour
 {
-    //TODO(earalov): implement traffic lights replacement?
     [TargetType(typeof(PropCollection))]
     public class PropCollectionDetour : PropCollection
     {
@@ -34,30 +34,26 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
-        private string GameObjectName => gameObject?.name;
-        private string ParentName => gameObject?.transform?.parent?.gameObject?.name;
-
         [RedirectMethod]
         private void Awake()
         {
-            if (ParentName == Constants.TropicalCollections || ParentName == Constants.SunnyCollections ||
-                ParentName == Constants.NorthCollections)
+            if (this.IsIgnored()
+                && (!(!Levels.IsNativeLevelEuropean() && gameObject?.name == Constants.EuropeBeautification)) //to load tennis court
+                && (!(!Levels.IsNativeLevelWinter() && gameObject?.name == Constants.WinterBeautification)) //to load curling
+                )
             {
-                if (EuroBuildingsUnlocker._nativeLevelName == Constants.EuropeLevel)
-                {
-                    Destroy(this);
-                    return;
-                }
+                Destroy(this);
+                return;
             }
-            else if (ParentName == Constants.EuropeCollections)
+            if ((!Levels.IsNativeLevelWinter() && gameObject?.name == Constants.WinterPreorderPack)) //to prevent wrong preorder pack props versions from loading
             {
-                if (EuroBuildingsUnlocker._nativeLevelName != Constants.EuropeLevel) {
-                    if (GameObjectName != Constants.EuropeBeautification)
-                    {
-                        Destroy(this);
-                        return;
-                    }
-                }
+                Destroy(this);
+                return;
+            }
+            if ((Levels.IsNativeLevelWinter() && gameObject?.name == Constants.PreorderPack))
+            {
+                m_prefabs = m_prefabs.Where(p => p.name == "Basketball Court Decal").ToArray();
+                m_replacedNames = null;
             }
             Singleton<LoadingManager>.instance.QueueLoadingAction(InitializePrefabs(this.gameObject.name, this.m_prefabs, this.m_replacedNames));
         }

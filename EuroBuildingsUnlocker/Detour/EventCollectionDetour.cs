@@ -7,8 +7,8 @@ using EuroBuildingsUnlocker.Redirection;
 
 namespace EuroBuildingsUnlocker.Detour
 {
-    [TargetType(typeof(TransportCollection))]
-    public class TransportCollectionDetour : TransportCollection
+    [TargetType(typeof(EventCollection))]
+    public class EventCollectionDetour : EventCollection
     {
         private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
@@ -18,7 +18,7 @@ namespace EuroBuildingsUnlocker.Detour
             {
                 return;
             }
-            _redirects = RedirectionUtil.RedirectType(typeof(TransportCollectionDetour));
+            _redirects = RedirectionUtil.RedirectType(typeof(EventCollectionDetour));
         }
         public static void Revert()
         {
@@ -46,7 +46,7 @@ namespace EuroBuildingsUnlocker.Detour
 
         [RedirectReverse]
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static IEnumerator InitializePrefabs(string name, TransportInfo[] prefabs, string[] replaces)
+        private static IEnumerator InitializePrefabs(string name, EventInfo[] prefabs, string[] replaces)
         {
             UnityEngine.Debug.Log($"{name}-{prefabs}-{(replaces == null ? "Null" : "Nonnull")}");
             return null;

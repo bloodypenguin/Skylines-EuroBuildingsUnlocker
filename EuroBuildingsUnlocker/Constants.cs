@@ -2,16 +2,19 @@
 {
     public static class Constants
     {
-        public const string TropicalLevel = "TropicalPrefabs";
-        public const string SunnyLevel = "SunnyPrefabs";
-        public const string NorthLevel = "NorthPrefabs";
-        public const string EuropeLevel = "EuropePrefabs";
+        public const string TropicalPrefabs = "TropicalPrefabs";
+        public const string SunnyPrefabs = "SunnyPrefabs";
+        public const string NorthPrefabs = "NorthPrefabs";
+        public const string EuropePrefabs = "EuropePrefabs";
+        public const string WinterPrefabs = "WinterPrefabs";
 
         public const string TropicalCollections = "Tropical Collections";
         public const string SunnyCollections = "Sunny Collections";
         public const string NorthCollections = "North Collections";
         public const string EuropeCollections = "Europe Collections";
+        public const string WinterCollections = "Winter Collections";
 
+        public const string Industrial = "Industrial";
         public const string CommercialHigh = "Commercial High";
         public const string ResidentialHigh = "Residential High";
         public const string Office = "Office";
@@ -33,7 +36,12 @@
         public const string NorthBeautification = "North Beautification";
         public const string EuropeMonument = "Europe Monument";
         public const string ExtraBuildings = "Extra Buildings";
-
+        public const string WinterBeautification = "Winter Beautification";
+        public const string WinterMonument = "Winter Monument";
+        public const string WinterIndustrialFarming = "Winter Industrial Farming";
+        public const string PreorderPack = "Preorder Pack";
+        public const string WinterPreorderPack = "Winter Preorder Pack";
+        public const string WinterGarbage = "Winter Garbage";
 
         public const string EuropeProps = "Europe Props";
     }

@@ -34,27 +34,13 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
-        private string ParentName => gameObject?.transform?.parent?.gameObject?.name;
-
         [RedirectMethod]
         private void Awake()
         {
-            if (ParentName == Constants.TropicalCollections || ParentName == Constants.SunnyCollections ||
-                ParentName == Constants.NorthCollections)
+            if (this.IsIgnored())
             {
-                if (EuroBuildingsUnlocker._nativeLevelName == Constants.EuropeLevel)
-                {
-                    Destroy(this);
-                    return;
-                }
-            }
-            else if (ParentName == Constants.EuropeCollections)
-            {
-                if (EuroBuildingsUnlocker._nativeLevelName != Constants.EuropeLevel)
-                {
-                    Destroy(this);
-                    return;
-                }
+                Destroy(this);
+                return;
             }
             Singleton<LoadingManager>.instance.QueueLoadingAction(InitializePrefabs(this.gameObject.name, this.m_prefabs, this.m_replacedNames));
         }

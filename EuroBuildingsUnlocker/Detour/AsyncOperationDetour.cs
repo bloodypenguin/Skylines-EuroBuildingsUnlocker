@@ -11,9 +11,11 @@ namespace EuroBuildingsUnlocker.Detour
     public class AsyncOperationDetour : AsyncOperation
     {
         public static AsyncOperation nativelevelOperation = null;
-        public static AsyncOperation additionalLevelOperation = null;
+        private static AsyncOperation nativeLevelOperation_addition = null;
         private static readonly object Lock = new object();
         private static RedirectCallsState _tempState;
+        public static Queue<string> additionalLevels = new Queue<string>();
+
 
         private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
@@ -82,18 +84,30 @@ namespace EuroBuildingsUnlocker.Detour
                 {
                     if (nativelevelOperation.isDone)
                     {
-                        if (additionalLevelOperation == null)
+                        if (nativeLevelOperation_addition == null || nativeLevelOperation_addition.isDone)
                         {
-                            if (EuroBuildingsUnlocker.debug)
+
+                            if (additionalLevels.Count > 0)
                             {
-                                Debug.Log($"EuroBuildingsUnlocker - It's time to load native level '{EuroBuildingsUnlocker._nativeLevelName}'");
+                                var additionalLevel = additionalLevels.Dequeue();
+                                if (EuroBuildingsUnlocker.debug)
+                                {
+                                    Debug.Log(
+                                        $"EuroBuildingsUnlocker - It's time to load additional level '{additionalLevel}'");
+                                }
+                                nativeLevelOperation_addition = Application.LoadLevelAdditiveAsync(additionalLevel);
+                                result = false;
                             }
-                            additionalLevelOperation = Application.LoadLevelAdditiveAsync(EuroBuildingsUnlocker._nativeLevelName);
-                            result = false;
+                            else
+                            {
+                                nativeLevelOperation_addition = null;
+                                nativelevelOperation = null;
+                                result = true;
+                            }
                         }
                         else
                         {
-                            result = additionalLevelOperation.isDone;
+                            result = false;
                         }
                     }
                     else

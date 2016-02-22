@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using ColossalFramework;
+using ColossalFramework.Packaging;
 using EuroBuildingsUnlocker.Redirection;
+using UnityEngine;
 
 namespace EuroBuildingsUnlocker.Detour
 {
@@ -33,27 +36,22 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
-        private bool IsInternationalPloppable => GameObjectName == Constants.FireDepartment || GameObjectName == Constants.PoliceDepartment || GameObjectName == Constants.Education || GameObjectName == Constants.HealthCare;
-        private bool IsInternationalGrowable => GameObjectName == Constants.CommercialHigh || GameObjectName == Constants.ResidentialHigh || GameObjectName == Constants.Office || GameObjectName == Constants.ExtraBuildings;
-        private bool IsEuropeanPloppable => GameObjectName == Constants.EuropeFireDepartment || GameObjectName == Constants.EuropePoliceDepartment || GameObjectName == Constants.EuropeEducation || GameObjectName == Constants.EuropeHealthCare || GameObjectName == Constants.EuropeBeautification || GameObjectName == Constants.EuropeMonument;
-        private bool IsEuropeanGrowable => GameObjectName == Constants.EuropeCommercialHigh || GameObjectName == Constants.EuropeResidentialHigh || GameObjectName == Constants.EuropeIndustrial || GameObjectName == Constants.EuropeOffice;
+        private bool IsIntUniquePloppable => GameObjectName == Constants.FireDepartment || GameObjectName == Constants.PoliceDepartment ||
+                                                 GameObjectName == Constants.Education || GameObjectName == Constants.HealthCare;
+        private bool IsEuroUniquePloppable => GameObjectName == Constants.EuropeFireDepartment || GameObjectName == Constants.EuropePoliceDepartment || GameObjectName == Constants.EuropeEducation || GameObjectName == Constants.EuropeHealthCare || GameObjectName == Constants.EuropeBeautification || GameObjectName == Constants.EuropeMonument;
         private string GameObjectName => gameObject?.name;
-        private string ParentName => gameObject?.transform?.parent?.gameObject?.name;
 
         [RedirectMethod]
         private void Awake()
         {
-            if (ParentName == Constants.TropicalCollections || ParentName == Constants.SunnyCollections ||
-                ParentName == Constants.NorthCollections)
+            var replacedNameOriginal = (string[]) m_replacedNames.Clone();
+            var prefabsOriginal = (BuildingInfo[])m_prefabs.Clone();
+
+            if (this.IsCollectionInternational() && !this.IsCollectionWinter())
             {
-                if (EuroBuildingsUnlocker._nativeLevelName == Constants.EuropeLevel)
+                if (Levels.IsNativeLevelEuropean())
                 {
-                    if (!IsInternationalGrowable && !IsInternationalPloppable)
-                    {
-                        Destroy(this);
-                        return;
-                    }
-                    if (IsInternationalGrowable && (OptionsHolder.Options & ModOption.LoadNonNativeGrowables) == 0)
+                    if (!IsIntUniquePloppable &&  GameObjectName != Constants.ExtraBuildings)
                     {
                         Destroy(this);
                         return;
@@ -62,34 +60,49 @@ namespace EuroBuildingsUnlocker.Detour
                     {
                         FixReplaces();
                     }
-                }
-                else
-                {
-                    if (IsInternationalGrowable && (OptionsHolder.Options & ModOption.LoadNativeGrowables) == 0)
+                    if (GameObjectName == Constants.ExtraBuildings)
                     {
-                        Destroy(this);
-                        return;
+                        EuroBuildingsUnlocker._extraBuildings = this;
                     }
                 }
             }
-            else if (ParentName == Constants.EuropeCollections)
+            else if (this.IsCollectionWinter())
             {
-                if (EuroBuildingsUnlocker._nativeLevelName == Constants.EuropeLevel)
+                if (Levels.IsNativeLevelWinter())
                 {
-                    if (IsEuropeanGrowable && (OptionsHolder.Options & ModOption.LoadNativeGrowables) == 0)
+                    if (GameObjectName == Constants.WinterBeautification)
                     {
-                        Destroy(this);
-                        return;
+                        m_replacedNames = null;
                     }
                 }
-                else
-                {
-                    if (!IsEuropeanGrowable && !IsEuropeanPloppable)
+                else {
+                    if (GameObjectName != Constants.WinterBeautification && GameObjectName != Constants.WinterMonument &&
+                            GameObjectName != Constants.WinterIndustrialFarming && GameObjectName != Constants.WinterGarbage)
                     {
                         Destroy(this);
                         return;
                     }
-                    if (IsEuropeanGrowable && ((OptionsHolder.Options & ModOption.LoadNonNativeGrowables) == 0 || EuroBuildingsUnlocker._euroStyleEnabled))
+                    if (GameObjectName == Constants.WinterIndustrialFarming)
+                    {
+                        m_prefabs = m_prefabs.Where(prefab => prefab.name.EndsWith("_Greenhouse")).ToArray();
+                        m_replacedNames = null;
+                    }
+                    if (GameObjectName == Constants.WinterGarbage)
+                    {
+                        m_prefabs = m_prefabs.Where(prefab => prefab.name == "Snowdump").ToArray();
+                        m_replacedNames = null;
+                    }
+                    if (GameObjectName == Constants.WinterBeautification)
+                    {
+                        m_replacedNames = null;
+                    }
+                }
+            }
+            else if (this.IsCollectionEuropean())
+            {
+                if (!Levels.IsNativeLevelEuropean())
+                {
+                    if (!IsEuroUniquePloppable)
                     {
                         Destroy(this);
                         return;
@@ -100,19 +113,95 @@ namespace EuroBuildingsUnlocker.Detour
                     }
                 }
             }
+
+
+            ResolveAfterDarkConflicts();
+            ResolvePreorderPackConflicts();
+            ResolveSignupPackConflicts();
+
             Singleton<LoadingManager>.instance.QueueLoadingAction(InitializePrefabs(this.gameObject.name, this.m_prefabs, this.m_replacedNames));
+            m_replacedNames = replacedNameOriginal;
+            m_prefabs = prefabsOriginal;
+
         }
 
-        //TODO(earalov): provide extra international industrial and low density buildings for Euro biome
-        //TODO(earalov): don't provide high density international buildings for European biome if non-native growables are disabled (or native in others)
-        //TODO(earalov): filter out redundant European industries when loading non-euro biomes
-        private void FixReplaces() //TODO(earalov): it's better to remove them from collections at all
+
+        private void ResolvePreorderPackConflicts()
+        {
+            if ((Levels.IsNativeLevelWinter() && gameObject?.name == Constants.PreorderPack))
+            {
+                m_prefabs = m_prefabs.Where(p => p.name == "Basketball Court" || p.name == "bouncer_castle").ToArray();
+                m_replacedNames = null;
+            }
+        }
+
+        private void ResolveAfterDarkConflicts()
+        {
+            if (this.IsCollectionSummerExpansion())
+            {
+                if (Levels.IsNativeLevelWinter())
+                {
+                    m_prefabs = m_prefabs.Where(prefab => prefab.name == "2x2_Jet_ski_rental"
+                                                          || prefab.name == "2x8_FishingPier" ||
+                                                          prefab.name == "Skatepark" ||
+                                                          prefab.name == "Beachvolley Court" ||
+                                                          prefab.name == "DrivingRange").ToArray();
+                    m_replacedNames = null;
+                }
+                else
+                {
+                    for (int i = 0; i < m_replacedNames.Length; i++)
+                    {
+                        if (m_replacedNames[i] == "2x2_winter_fishing_pier")
+                        {
+                            m_replacedNames[i] = null;
+                        }
+                    }
+                }
+            }
+            else if (this.IsCollectionWinterExpansion())
+            {
+                if (Levels.IsNativeLevelWinter())
+                {
+                    for (int i = 0; i < m_replacedNames.Length; i++)
+                    {
+                        if (m_replacedNames[i] == "2x2_Jet_ski_rental")
+                        {
+                            m_replacedNames[i] = null;
+                        }
+                    }
+                }
+                else
+                {
+                    m_prefabs = m_prefabs.Where(prefab => prefab.name == "2x2_winter_fishing_pier"
+                                                          || prefab.name == "Snowmobile Track" ||
+                                                          prefab.name == "Ice_Fishing_Pond" || prefab.name == "Ice Hockey Rink")
+                        .ToArray();
+                    m_replacedNames = null;
+                }
+            }
+        }
+
+
+
+        private void ResolveSignupPackConflicts()
+        {
+            if (Util.IsSnowfallInstalled() && Levels.IsWinterUnlockerEnabled)
+            {
+                if (GameObjectName == "Signup Pack" || GameObjectName == "Winter Signup Pack")
+                {
+                    m_replacedNames = null;
+                }
+            }
+        }
+
+        private void FixReplaces()
         {
             if (m_prefabs == null)
             {
                 return;
             }
-            var newPrefabs= new List<BuildingInfo>();
+            var newPrefabs = new List<BuildingInfo>();
             for (var i = 0; i < m_prefabs.Length; i++)
             {
                 var prefabName = m_prefabs[i].name;

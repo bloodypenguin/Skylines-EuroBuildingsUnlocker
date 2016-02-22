@@ -17,6 +17,7 @@ namespace EuroBuildingsUnlocker.Detour
             }
             _redirects = RedirectionUtil.RedirectType(typeof(MilestoneCollectionDetour));
         }
+
         public static void Revert()
         {
             if (_redirects == null)
@@ -30,27 +31,13 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
-        private string ParentName => gameObject?.transform?.parent?.gameObject?.name;
-
         [RedirectMethod]
         private void Awake()
         {
-            if (ParentName == Constants.TropicalCollections || ParentName == Constants.SunnyCollections ||
-                ParentName == Constants.NorthCollections)
+            if (this.IsIgnored())
             {
-                if (EuroBuildingsUnlocker._nativeLevelName == Constants.EuropeLevel)
-                {
-                    Destroy(this);
-                    return;
-                }
-            }
-            else if (ParentName == Constants.EuropeCollections)
-            {
-                if (EuroBuildingsUnlocker._nativeLevelName != Constants.EuropeLevel)
-                {
-                    Destroy(this);
-                    return;
-                }
+                Destroy(this);
+                return;
             }
             MilestoneCollection.InitializeMilestones(this.m_Milestones);
         }

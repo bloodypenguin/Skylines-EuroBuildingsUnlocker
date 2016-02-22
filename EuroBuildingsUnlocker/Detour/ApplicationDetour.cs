@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using ColossalFramework;
 using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
 
@@ -12,7 +10,7 @@ namespace EuroBuildingsUnlocker.Detour
     public class ApplicationDetour
     {
         private static readonly object Lock = new object();
-
+        private static RedirectCallsState _tempState;
         private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
         public static void Deploy()
@@ -36,6 +34,32 @@ namespace EuroBuildingsUnlocker.Detour
             _redirects = null;
         }
 
+        private static void RevertTemp()
+        {
+            if (_redirects == null)
+            {
+                return;
+            }
+            foreach (var redirect in _redirects)
+            {
+                _tempState = RedirectionHelper.RevertJumpTo(redirect.Key.MethodHandle.GetFunctionPointer(), redirect.Value);
+                break;
+            }
+        }
+
+        private static void DeployBack()
+        {
+            if (_redirects == null)
+            {
+                return;
+            }
+            foreach (var redirect in _redirects)
+            {
+                RedirectionHelper.RevertJumpTo(redirect.Key.MethodHandle.GetFunctionPointer(), _tempState);
+                break;
+            }
+        }
+
         [RedirectMethod]
         public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
         {
@@ -46,61 +70,61 @@ namespace EuroBuildingsUnlocker.Detour
             }
             try
             {
+                RevertTemp();
                 if (EuroBuildingsUnlocker._nativeLevelName == null)
                 {
-                    EuroBuildingsUnlocker._nativeLevelName = GetNativeLevel();
+                    EuroBuildingsUnlocker._nativeLevelName = Levels.GetNativeLevel();
                 }
                 var isNativeLevel = false;
-                string levelToLoad;
-                if (levelName != EuroBuildingsUnlocker._nativeLevelName || AsyncOperationDetour.nativelevelOperation != null)
+                if (levelName == EuroBuildingsUnlocker._nativeLevelName && AsyncOperationDetour.nativelevelOperation == null)
                 {
-                    levelToLoad = levelName;
-                }
-                else
-                {
-                    if (EuroBuildingsUnlocker.debug)
-                    {
-                        Debug.Log($"EuroBuildingsUnlocker - Loading native level: '{levelName}'");
-                    }
-                    EuroBuildingsUnlocker._additionalLevelName = EuroBuildingsUnlocker._nativeLevelName == "EuropePrefabs" ? "TropicalPrefabs" : "EuropePrefabs";
-                    levelToLoad = EuroBuildingsUnlocker._additionalLevelName;
-                    if (EuroBuildingsUnlocker.debug)
-                    {
-                        Debug.Log($"EuroBuildingsUnlocker - It's time to load additional level '{levelToLoad}'");
-                    }
+                    levelName = Levels.GetFirstNonNativeLevel();
                     isNativeLevel = true;
                 }
-                //TODO(earalov): use low level redirection instead
-                Revert();
-                var asyncOperation = Application.LoadLevelAdditiveAsync(levelToLoad);
-                if (isNativeLevel)
+                var asyncOperation = Application.LoadLevelAdditiveAsync(levelName);
+                if (!isNativeLevel)
                 {
-                    AsyncOperationDetour.nativelevelOperation = asyncOperation;
+                    return asyncOperation;
                 }
+                AsyncOperationDetour.nativelevelOperation = asyncOperation;
+                var secondNonNativeLevel = Levels.GetSecondNonNativeLevel();
+                if (secondNonNativeLevel != null)
+                {
+                    AsyncOperationDetour.additionalLevels.Enqueue(secondNonNativeLevel);
+                }
+                if (Levels.IsNativeLevelWinter())
+                {
+                    if (Levels.IsWinterUnlockerEnabled)
+                    {
+                        if (Util.IsAfterDarkInstalled())
+                        {
+                            AsyncOperationDetour.additionalLevels.Enqueue("Expansion1Prefabs");
+                        }
+                        if (Util.IsPreorderPackInstalled())
+                        {
+                            AsyncOperationDetour.additionalLevels.Enqueue("PreorderPackPrefabs");
+                        }
+                        AsyncOperationDetour.additionalLevels.Enqueue("SignupPackPrefabs");
+                    }
+                }
+                else {
+                    if (Util.IsSnowfallInstalled() && Levels.IsWinterUnlockerEnabled)
+                    {
+                        if (Util.IsAfterDarkInstalled())
+                        {
+                            AsyncOperationDetour.additionalLevels.Enqueue("WinterExpansion1Prefabs");
+                        }
+                        AsyncOperationDetour.additionalLevels.Enqueue("WinterSignupPackPrefabs");
+                    }
+                }
+                AsyncOperationDetour.additionalLevels.Enqueue(EuroBuildingsUnlocker._nativeLevelName);
                 return asyncOperation;
             }
             finally
             {
-                //TODO(earalov): use low level redirection instead
-                Deploy();
+                DeployBack();
                 Monitor.Exit(Lock);
             }
-        }
-
-        private static string GetNativeLevel()
-        {
-            var simulationManager = Singleton<SimulationManager>.instance;
-            var mMetaData = simulationManager?.m_metaData;
-            var env = mMetaData?.m_environment;
-            if (env == null)
-            {
-                return null;
-            }
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log($"EuroBuildingsUnlocker - Environment is '{env}'");
-            }
-            return $"{env}Prefabs";
         }
     }
 }

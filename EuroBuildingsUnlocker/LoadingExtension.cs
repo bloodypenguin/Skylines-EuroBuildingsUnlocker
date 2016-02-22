@@ -17,6 +17,7 @@ namespace EuroBuildingsUnlocker
             {
                 UnityEngine.Debug.Log("EuroBuildingsUnlocker - OnCreated");
             }
+            Levels.CheckIfWinterUnlockerEnabled();
             if (_bootstrapped)
             {
                 if (EuroBuildingsUnlocker.debug)
@@ -30,15 +31,15 @@ namespace EuroBuildingsUnlocker
             {
                 Debug.Log("EuroBuildingsUnlocker - SetUp");
             }
+            EuroBuildingsUnlocker._nativeLevelName = null;
             ApplicationDetour.Deploy();
             AsyncOperationDetour.Deploy();
-            EuroBuildingsUnlocker._nativeLevelName = null;
-            EuroBuildingsUnlocker._additionalLevelName = null;
             BuildingCollectionDetour.Deploy();
             PropCollectionDetour.Deploy();
             NetCollectionDetour.Deploy();
             CitizenCollectionDetour.Deploy();
             VehicleCollectionDetour.Deploy();
+            EventCollectionDetour.Deploy();
             TransportCollectionDetour.Deploy();
             EffectCollectionDetour.Deploy();
             MilestoneCollectionDetour.Deploy();
@@ -46,15 +47,7 @@ namespace EuroBuildingsUnlocker
             TreeCollectionDetour.Deploy();
             DistrictPolicyCollectionDetour.Deploy();
             BuildingCollectionDetour.Deploy();
-            try
-            {
-                var europeanStyles = PackageManager.FindAssetByName("System." + DistrictStyle.kEuropeanStyleName);
-                EuroBuildingsUnlocker._euroStyleEnabled = (europeanStyles != null && europeanStyles.isEnabled);
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogException(e);
-            }
+            LoadingManagerDetour.Deploy();
             _bootstrapped = true;
         }
         
@@ -78,14 +71,16 @@ namespace EuroBuildingsUnlocker
             {
                 Debug.Log("EuroBuildingsUnlocker - Reset");
             }
-            ApplicationDetour.Revert();
             EuroBuildingsUnlocker._nativeLevelName = null;
-            EuroBuildingsUnlocker._additionalLevelName = null;
+            EuroBuildingsUnlocker._extraBuildings = null;
+            ApplicationDetour.Revert();
+            AsyncOperationDetour.Revert();
             BuildingCollectionDetour.Revert();
             PropCollectionDetour.Revert();
             NetCollectionDetour.Revert();
             CitizenCollectionDetour.Revert();
             VehicleCollectionDetour.Revert();
+            EventCollectionDetour.Revert();
             TransportCollectionDetour.Revert();
             EffectCollectionDetour.Revert();
             MilestoneCollectionDetour.Revert();
@@ -93,6 +88,7 @@ namespace EuroBuildingsUnlocker
             TreeCollectionDetour.Revert();
             DistrictPolicyCollectionDetour.Revert();
             BuildingCollectionDetour.Revert();
+            LoadingManagerDetour.Revert();
             _bootstrapped = false;
         }
     }
