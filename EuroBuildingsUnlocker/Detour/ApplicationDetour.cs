@@ -1,114 +1,128 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
 
-namespace EuroBuildingsUnlocker
+namespace EuroBuildingsUnlocker.Detour
 {
+    [TargetType(typeof(Application))]
     public class ApplicationDetour
     {
         private static readonly object Lock = new object();
-        private static RedirectCallsState _stateLoadLevel;
-        private static bool _deployed;
-
+        private static RedirectCallsState _tempState;
+        private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
 
         public static void Deploy()
         {
-            if (_deployed)
+            if (_redirects != null)
             {
                 return;
             }
-            try
-            {
-                RedirectLoadLevelAdditiveAsync();
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
-            }
-
-            _deployed = true;
+            _redirects = RedirectionUtil.RedirectType(typeof(ApplicationDetour));
         }
-
-
         public static void Revert()
         {
-            if (!_deployed)
+            if (_redirects == null)
             {
                 return;
             }
-            try
+            foreach (var redirect in _redirects)
             {
-                RevertLoadLevelAdditiveAsync();
+                RedirectionHelper.RevertRedirect(redirect.Key, redirect.Value);
             }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogError(e);
-            }
-            _deployed = false;
+            _redirects = null;
         }
 
-        public static void RedirectLoadLevelAdditiveAsync()
+        private static void RevertTemp()
         {
-            if (EuroBuildingsUnlocker.debug)
+            if (_redirects == null)
             {
-                Debug.Log("EuroBuildingsUnlocker - RedirectLoadLevelAdditiveAsync");
+                return;
             }
-            _stateLoadLevel =  RedirectionHelper.RedirectCalls
-               (
-                   typeof(Application).GetMethod("LoadLevelAdditiveAsync", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null),
-                   typeof(ApplicationDetour).GetMethod("LoadLevelAdditiveAsync", BindingFlags.Static | BindingFlags.Public)
-               );
+            foreach (var redirect in _redirects)
+            {
+                _tempState = RedirectionHelper.RevertJumpTo(redirect.Key.MethodHandle.GetFunctionPointer(), redirect.Value);
+                break;
+            }
         }
 
-        public static void RevertLoadLevelAdditiveAsync()
+        private static void DeployBack()
         {
-            if (EuroBuildingsUnlocker.debug)
+            if (_redirects == null)
             {
-                Debug.Log("EuroBuildingsUnlocker - RevertLoadLevelAdditiveAsync");
+                return;
             }
-            RedirectionHelper.RevertRedirect
-                (
-                    typeof(Application).GetMethod("LoadLevelAdditiveAsync", BindingFlags.Static | BindingFlags.Public, null, new[] { typeof(string) }, null),
-                    _stateLoadLevel
-                );
+            foreach (var redirect in _redirects)
+            {
+                RedirectionHelper.RevertJumpTo(redirect.Key.MethodHandle.GetFunctionPointer(), _tempState);
+                break;
+            }
         }
 
+        [RedirectMethod]
         public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
         {
+            Monitor.Enter(Lock);
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log("EuroBuildingsUnlocker - Loading level");
+                Debug.Log($"EuroBuildingsUnlocker - Loading level {levelName}");
             }
-            Monitor.Enter(Lock);
             try
             {
-                string levelToLoad;
-                if (levelName != EuroBuildingsUnlocker._nativeLevelName)
+                RevertTemp();
+                if (EuroBuildingsUnlocker._nativeLevelName == null)
                 {
-                    levelToLoad = levelName;
+                    EuroBuildingsUnlocker._nativeLevelName = Levels.GetNativeLevel();
                 }
-                else
+                var isNativeLevel = false;
+                if (levelName == EuroBuildingsUnlocker._nativeLevelName && AsyncOperationDetour.nativelevelOperation == null)
                 {
-                    if (EuroBuildingsUnlocker.debug)
+                    levelName = Levels.GetFirstNonNativeLevel();
+                    isNativeLevel = true;
+                }
+                var asyncOperation = Application.LoadLevelAdditiveAsync(levelName);
+                if (!isNativeLevel)
+                {
+                    return asyncOperation;
+                }
+                AsyncOperationDetour.nativelevelOperation = asyncOperation;
+                var secondNonNativeLevel = Levels.GetSecondNonNativeLevel();
+                if (secondNonNativeLevel != null)
+                {
+                    AsyncOperationDetour.additionalLevels.Enqueue(secondNonNativeLevel);
+                }
+                if (Levels.IsNativeLevelWinter())
+                {
+                    if (Levels.IsWinterUnlockerEnabled)
                     {
-                        Debug.Log(String.Format("EuroBuildingsUnlocker - Loading native level: '{0}'", levelName));
-                    }
-                    EuroBuildingsUnlocker._additionalLevelName = Util.GetEnv() == "Europe" ? "TropicalPrefabs" : "EuropePrefabs";
-                    levelToLoad = EuroBuildingsUnlocker._additionalLevelName;
-                    if (EuroBuildingsUnlocker.debug)
-                    {
-                        Debug.Log(String.Format("EuroBuildingsUnlocker - It's time to load additional level '{0}'",
-                            levelToLoad));
+                        if (Util.IsAfterDarkInstalled())
+                        {
+                            AsyncOperationDetour.additionalLevels.Enqueue("Expansion1Prefabs");
+                        }
+                        if (Util.IsPreorderPackInstalled())
+                        {
+                            AsyncOperationDetour.additionalLevels.Enqueue("PreorderPackPrefabs");
+                        }
+                        AsyncOperationDetour.additionalLevels.Enqueue("SignupPackPrefabs");
                     }
                 }
-                ApplicationDetour.Revert();
-                var result = Application.LoadLevelAdditiveAsync(levelToLoad);
-                ApplicationDetour.Deploy();
-                return result;
+                else {
+                    if (Util.IsSnowfallInstalled() && Levels.IsWinterUnlockerEnabled)
+                    {
+                        if (Util.IsAfterDarkInstalled())
+                        {
+                            AsyncOperationDetour.additionalLevels.Enqueue("WinterExpansion1Prefabs");
+                        }
+                        AsyncOperationDetour.additionalLevels.Enqueue("WinterSignupPackPrefabs");
+                    }
+                }
+                AsyncOperationDetour.additionalLevels.Enqueue(EuroBuildingsUnlocker._nativeLevelName);
+                return asyncOperation;
             }
             finally
             {
+                DeployBack();
                 Monitor.Exit(Lock);
             }
         }
