@@ -63,11 +63,11 @@ namespace EuroBuildingsUnlocker.Detour
         [RedirectMethod]
         public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
         {
-            Monitor.Enter(Lock);
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log($"EuroBuildingsUnlocker - Loading level {levelName}");
+                Debug.Log($"EuroBuildingsUnlocker - ApplicationDetour - level {levelName} loading was demanded");
             }
+            Monitor.Enter(Lock);
             try
             {
                 RevertTemp();
@@ -80,6 +80,10 @@ namespace EuroBuildingsUnlocker.Detour
                 {
                     levelName = Levels.GetFirstNonNativeLevel();
                     isNativeLevel = true;
+                }
+                if (EuroBuildingsUnlocker.debug)
+                {
+                    Debug.Log($"EuroBuildingsUnlocker - ApplicationDetour - Loading level {levelName}");
                 }
                 var asyncOperation = Application.LoadLevelAdditiveAsync(levelName);
                 if (!isNativeLevel)

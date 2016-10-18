@@ -92,8 +92,7 @@ namespace EuroBuildingsUnlocker.Detour
                                 var additionalLevel = additionalLevels.Dequeue();
                                 if (EuroBuildingsUnlocker.debug)
                                 {
-                                    Debug.Log(
-                                        $"EuroBuildingsUnlocker - It's time to load additional level '{additionalLevel}'");
+                                    Debug.Log($"EuroBuildingsUnlocker - AsyncOperationDetour - Loading level {additionalLevel}");
                                 }
                                 nativeLevelOperation_addition = Application.LoadLevelAdditiveAsync(additionalLevel);
                                 result = false;
