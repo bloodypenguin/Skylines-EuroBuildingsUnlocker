@@ -11,28 +11,6 @@ namespace EuroBuildingsUnlocker.Detour
     [TargetType(typeof(CitizenCollection))]
     public class CitizenCollectionDetour : CitizenCollection
     {
-        private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
-
-        public static void Deploy()
-        {
-            if (_redirects != null)
-            {
-                return;
-            }
-            _redirects = RedirectionUtil.RedirectType(typeof(CitizenCollectionDetour));
-        }
-        public static void Revert()
-        {
-            if (_redirects == null)
-            {
-                return;
-            }
-            foreach (var redirect in _redirects)
-            {
-                RedirectionHelper.RevertRedirect(redirect.Key, redirect.Value);
-            }
-            _redirects = null;
-        }
 
         private string GameObjectName => gameObject?.name;
         private string ParentName => gameObject?.transform?.parent?.gameObject?.name;

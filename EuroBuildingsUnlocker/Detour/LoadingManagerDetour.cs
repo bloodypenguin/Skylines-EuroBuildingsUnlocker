@@ -9,28 +9,6 @@ namespace EuroBuildingsUnlocker.Detour
     [TargetType(typeof(LoadingManager))]
     public class LoadingManagerDetour : LoadingManager
     {
-        private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
-
-        public static void Deploy()
-        {
-            if (_redirects != null)
-            {
-                return;
-            }
-            _redirects = RedirectionUtil.RedirectType(typeof(LoadingManagerDetour));
-        }
-        public static void Revert()
-        {
-            if (_redirects == null)
-            {
-                return;
-            }
-            foreach (var redirect in _redirects)
-            {
-                RedirectionHelper.RevertRedirect(redirect.Key, redirect.Value);
-            }
-            _redirects = null;
-        }
 
         [RedirectMethod]
         private void AddChildrenToBuiltinStyle(GameObject obj, DistrictStyle style, bool spawnNormally)

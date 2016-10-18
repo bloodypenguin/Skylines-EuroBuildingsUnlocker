@@ -1,6 +1,7 @@
 ﻿using System;
 using ColossalFramework.Packaging;
 using EuroBuildingsUnlocker.Detour;
+using EuroBuildingsUnlocker.Redirection;
 using ICities;
 using UnityEngine;
 
@@ -34,23 +35,29 @@ namespace EuroBuildingsUnlocker
             EuroBuildingsUnlocker._nativeLevelName = null;
             ApplicationDetour.Deploy();
             AsyncOperationDetour.Deploy();
-            BuildingCollectionDetour.Deploy();
-            PropCollectionDetour.Deploy();
-            NetCollectionDetour.Deploy();
-            CitizenCollectionDetour.Deploy();
-            VehicleCollectionDetour.Deploy();
-            EventCollectionDetour.Deploy();
-            TransportCollectionDetour.Deploy();
-            EffectCollectionDetour.Deploy();
-            MilestoneCollectionDetour.Deploy();
-            ItemClassCollectionDetour.Deploy();
-            TreeCollectionDetour.Deploy();
-            DistrictPolicyCollectionDetour.Deploy();
-            BuildingCollectionDetour.Deploy();
-            LoadingManagerDetour.Deploy();
+            Redirector<BuildingCollectionDetour>.Deploy();
+            Redirector<PropCollectionDetour>.Deploy();
+            Redirector<NetCollectionDetour>.Deploy();
+            Redirector<CitizenCollectionDetour>.Deploy();
+            Redirector<VehicleCollectionDetour>.Deploy();
+            Redirector<EventCollectionDetour>.Deploy();
+            Redirector<TransportCollectionDetour>.Deploy();
+            Redirector<EffectCollectionDetour>.Deploy();
+            Redirector<MilestoneCollectionDetour>.Deploy();
+            Redirector<ItemClassCollectionDetour>.Deploy();
+            Redirector<TreeCollectionDetour>.Deploy();
+            Redirector<DistrictPolicyCollectionDetour>.Deploy();
+            Redirector<BuildingCommonCollectionDetour>.Deploy();
+            Redirector<LoadingManagerDetour>.Deploy();
             _bootstrapped = true;
         }
-        
+
+        public override void OnLevelUnloading()
+        {
+            EuroBuildingsUnlocker._nativeLevelName = null;
+            EuroBuildingsUnlocker._extraBuildings = null;
+        }
+
         public override void OnReleased()
         {
             base.OnReleased();
@@ -75,20 +82,20 @@ namespace EuroBuildingsUnlocker
             EuroBuildingsUnlocker._extraBuildings = null;
             ApplicationDetour.Revert();
             AsyncOperationDetour.Revert();
-            BuildingCollectionDetour.Revert();
-            PropCollectionDetour.Revert();
-            NetCollectionDetour.Revert();
-            CitizenCollectionDetour.Revert();
-            VehicleCollectionDetour.Revert();
-            EventCollectionDetour.Revert();
-            TransportCollectionDetour.Revert();
-            EffectCollectionDetour.Revert();
-            MilestoneCollectionDetour.Revert();
-            ItemClassCollectionDetour.Revert();
-            TreeCollectionDetour.Revert();
-            DistrictPolicyCollectionDetour.Revert();
-            BuildingCollectionDetour.Revert();
-            LoadingManagerDetour.Revert();
+            Redirector<BuildingCollectionDetour>.Revert();
+            Redirector<PropCollectionDetour>.Revert();
+            Redirector<NetCollectionDetour>.Revert();
+            Redirector<CitizenCollectionDetour>.Revert();
+            Redirector<VehicleCollectionDetour>.Revert();
+            Redirector<EventCollectionDetour>.Revert();
+            Redirector<TransportCollectionDetour>.Revert();
+            Redirector<EffectCollectionDetour>.Revert();
+            Redirector<MilestoneCollectionDetour>.Revert();
+            Redirector<ItemClassCollectionDetour>.Revert();
+            Redirector<TreeCollectionDetour>.Revert();
+            Redirector<DistrictPolicyCollectionDetour>.Revert();
+            Redirector<BuildingCommonCollectionDetour>.Revert();
+            Redirector<LoadingManagerDetour>.Revert();
             _bootstrapped = false;
         }
     }

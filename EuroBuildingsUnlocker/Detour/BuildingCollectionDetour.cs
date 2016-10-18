@@ -1,40 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using ColossalFramework;
-using ColossalFramework.Packaging;
 using EuroBuildingsUnlocker.Redirection;
-using UnityEngine;
 
 namespace EuroBuildingsUnlocker.Detour
 {
     [TargetType(typeof(BuildingCollection))]
     public class BuildingCollectionDetour : BuildingCollection
     {
-        private static Dictionary<MethodInfo, RedirectCallsState> _redirects;
-
-        public static void Deploy()
-        {
-            if (_redirects != null)
-            {
-                return;
-            }
-            _redirects = RedirectionUtil.RedirectType(typeof(BuildingCollectionDetour));
-        }
-        public static void Revert()
-        {
-            if (_redirects == null)
-            {
-                return;
-            }
-            foreach (var redirect in _redirects)
-            {
-                RedirectionHelper.RevertRedirect(redirect.Key, redirect.Value);
-            }
-            _redirects = null;
-        }
 
         private bool IsIntUniquePloppable => GameObjectName == Constants.FireDepartment || GameObjectName == Constants.PoliceDepartment ||
                                                  GameObjectName == Constants.Education || GameObjectName == Constants.HealthCare;
