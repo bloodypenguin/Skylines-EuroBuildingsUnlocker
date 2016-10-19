@@ -28,11 +28,7 @@ namespace EuroBuildingsUnlocker
                 return;
             }
             Util.NullifyEnvironmentVariable();
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log("EuroBuildingsUnlocker - SetUp");
-            }
-            EuroBuildingsUnlocker._nativeLevelName = null;
+            Levels.ResetNativeLevel();
             ApplicationDetour.Deploy();
             AsyncOperationDetour.Deploy();
             Redirector<BuildingCollectionDetour>.Deploy();
@@ -49,13 +45,8 @@ namespace EuroBuildingsUnlocker
             Redirector<DistrictPolicyCollectionDetour>.Deploy();
             Redirector<BuildingCommonCollectionDetour>.Deploy();
             Redirector<LoadingManagerDetour>.Deploy();
+            LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
             _bootstrapped = true;
-        }
-
-        public override void OnLevelUnloading()
-        {
-            EuroBuildingsUnlocker._nativeLevelName = null;
-            EuroBuildingsUnlocker._extraBuildings = null;
         }
 
         public override void OnReleased()
@@ -74,12 +65,7 @@ namespace EuroBuildingsUnlocker
                 return;
             }
             Util.NullifyEnvironmentVariable();
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log("EuroBuildingsUnlocker - Reset");
-            }
-            EuroBuildingsUnlocker._nativeLevelName = null;
-            EuroBuildingsUnlocker._extraBuildings = null;
+            Levels.ResetNativeLevel();
             ApplicationDetour.Revert();
             AsyncOperationDetour.Revert();
             Redirector<BuildingCollectionDetour>.Revert();
@@ -96,6 +82,7 @@ namespace EuroBuildingsUnlocker
             Redirector<DistrictPolicyCollectionDetour>.Revert();
             Redirector<BuildingCommonCollectionDetour>.Revert();
             Redirector<LoadingManagerDetour>.Revert();
+            LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
             _bootstrapped = false;
         }
     }

@@ -19,6 +19,13 @@ namespace EuroBuildingsUnlocker
             }
         }
 
+        public static bool IsHdGrowable(BuildingInfo building)
+        {
+            return building.m_class.m_subService == ItemClass.SubService.ResidentialHigh ||
+                   building.m_class.m_subService == ItemClass.SubService.CommercialHigh ||
+                   building.m_class.m_service == ItemClass.Service.Office;
+        }
+
         public static bool IsCollectionEuropean(this Component component)
         {
             return ParentName(component) == Constants.EuropeCollections;

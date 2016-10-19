@@ -9,8 +9,6 @@ namespace EuroBuildingsUnlocker
 #else
         public static bool debug = false;
 #endif
-        public static string _nativeLevelName;
-        public static BuildingCollection _extraBuildings;
 
         public string Name => "EuropeanBuildingsUnlocker";
 

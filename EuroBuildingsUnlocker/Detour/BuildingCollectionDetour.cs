@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using ColossalFramework;
+using ColossalFramework.Packaging;
 using EuroBuildingsUnlocker.Redirection;
 
 namespace EuroBuildingsUnlocker.Detour
@@ -19,14 +21,14 @@ namespace EuroBuildingsUnlocker.Detour
         [RedirectMethod]
         private void Awake()
         {
-            var replacedNameOriginal = (string[]) m_replacedNames.Clone();
+            var replacedNameOriginal = (string[])m_replacedNames.Clone();
             var prefabsOriginal = (BuildingInfo[])m_prefabs.Clone();
 
             if (this.IsCollectionInternational() && !this.IsCollectionWinter())
             {
                 if (Levels.IsNativeLevelEuropean())
                 {
-                    if (!IsIntUniquePloppable &&  GameObjectName != Constants.ExtraBuildings)
+                    if (!IsIntUniquePloppable && GameObjectName != Constants.ExtraBuildings)
                     {
                         Destroy(this);
                         return;
@@ -37,7 +39,7 @@ namespace EuroBuildingsUnlocker.Detour
                     }
                     if (GameObjectName == Constants.ExtraBuildings)
                     {
-                        EuroBuildingsUnlocker._extraBuildings = this;
+                        ManageExtraBuildings();
                     }
                 }
             }
@@ -50,7 +52,8 @@ namespace EuroBuildingsUnlocker.Detour
                         m_replacedNames = null;
                     }
                 }
-                else {
+                else
+                {
                     if (GameObjectName != Constants.WinterBeautification && GameObjectName != Constants.WinterMonument &&
                             GameObjectName != Constants.WinterIndustrialFarming && GameObjectName != Constants.WinterGarbage)
                     {
@@ -98,6 +101,33 @@ namespace EuroBuildingsUnlocker.Detour
             m_replacedNames = replacedNameOriginal;
             m_prefabs = prefabsOriginal;
 
+        }
+
+        private void ManageExtraBuildings()
+        {
+            var vanillaStyle = PackageManager.FindAssetByName("System." + DistrictStyle.kEuropeanStyleName);
+            if (vanillaStyle != null && vanillaStyle.isEnabled)
+            {
+                LoadingManagerDetour.addChildrenToBuiltinStyleHook = (go, style, spawnNormally) =>
+                {
+                    foreach (var building in this.m_prefabs)
+                    {
+                        var isHdGrowable = Util.IsHdGrowable(building);
+                        if (spawnNormally || isHdGrowable)
+                        {
+                            continue;
+                        }
+                        style.Add(building);
+                        building.m_dontSpawnNormally = true;
+                    }
+                    LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
+                };
+            }
+            else
+            {
+                LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
+                m_prefabs = m_prefabs.Where(p => !Util.IsHdGrowable(p)).ToArray();
+            }
         }
 
 

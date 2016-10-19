@@ -5,11 +5,50 @@ namespace EuroBuildingsUnlocker
 {
     public static class Levels
     {
+        private static string _nativeLevelName;
+
         public static bool IsWinterUnlockerEnabled { get; private set; }
+
+        public static void DetectNativeLevel()
+        {
+            if (_nativeLevelName != null)
+            {
+                return;
+            }
+            var simulationManager = Singleton<SimulationManager>.instance;
+            var mMetaData = simulationManager?.m_metaData;
+            var env = mMetaData?.m_environment;
+            if (env == null)
+            {
+                _nativeLevelName = null;
+            }
+            else
+            {
+                if (EuroBuildingsUnlocker.debug)
+                {
+                    Debug.Log($"EuroBuildingsUnlocker - Environment is '{env}'");
+                }
+                _nativeLevelName = $"{env}Prefabs";
+            }
+        }
+
+        public static void ResetNativeLevel()
+        {
+            if (EuroBuildingsUnlocker.debug)
+            {
+                Debug.Log("EuroBuildingsUnlocker - ResetNativeLevel native level name");
+            }
+            _nativeLevelName = null;
+        }
 
         public static void CheckIfWinterUnlockerEnabled()
         {
             IsWinterUnlockerEnabled = Util.IsModActive("Winter Buildings Unlocker");
+        }
+
+        public static string GetNativeLevel()
+        {
+            return _nativeLevelName;
         }
 
         public static string GetFirstNonNativeLevel()
@@ -34,22 +73,6 @@ namespace EuroBuildingsUnlocker
             return null;
         }
 
-        public static string GetNativeLevel()
-        {
-            var simulationManager = Singleton<SimulationManager>.instance;
-            var mMetaData = simulationManager?.m_metaData;
-            var env = mMetaData?.m_environment;
-            if (env == null)
-            {
-                return null;
-            }
-            if (EuroBuildingsUnlocker.debug)
-            {
-                Debug.Log($"EuroBuildingsUnlocker - Environment is '{env}'");
-            }
-            return $"{env}Prefabs";
-        }
-
         public static bool IsIgnored(this Component component)
         {
             if (component.IsCollectionInternational() && !component.IsCollectionWinter())
@@ -65,13 +88,15 @@ namespace EuroBuildingsUnlocker
                 {
                     return true;
                 }
-            } else if (component.IsCollectionWinter())
+            }
+            else if (component.IsCollectionWinter())
             {
                 if (!IsNativeLevelWinter())
                 {
                     return true;
                 }
-            } else if (component.IsCollectionWinterExpansion())
+            }
+            else if (component.IsCollectionWinterExpansion())
             {
                 if (!IsNativeLevelWinter())
                 {
@@ -90,12 +115,12 @@ namespace EuroBuildingsUnlocker
 
         public static bool IsNativeLevelWinter()
         {
-            return EuroBuildingsUnlocker._nativeLevelName == Constants.WinterPrefabs;
+            return _nativeLevelName == Constants.WinterPrefabs;
         }
 
         public static bool IsNativeLevelEuropean()
         {
-            return EuroBuildingsUnlocker._nativeLevelName == Constants.EuropePrefabs;
+            return _nativeLevelName == Constants.EuropePrefabs;
         }
     }
 }

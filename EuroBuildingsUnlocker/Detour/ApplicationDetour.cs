@@ -71,12 +71,9 @@ namespace EuroBuildingsUnlocker.Detour
             try
             {
                 RevertTemp();
-                if (EuroBuildingsUnlocker._nativeLevelName == null)
-                {
-                    EuroBuildingsUnlocker._nativeLevelName = Levels.GetNativeLevel();
-                }
+                Levels.DetectNativeLevel();
                 var isNativeLevel = false;
-                if (levelName == EuroBuildingsUnlocker._nativeLevelName && AsyncOperationDetour.nativelevelOperation == null)
+                if (levelName == Levels.GetNativeLevel() && AsyncOperationDetour.nativelevelOperation == null)
                 {
                     levelName = Levels.GetFirstNonNativeLevel();
                     isNativeLevel = true;
@@ -121,7 +118,7 @@ namespace EuroBuildingsUnlocker.Detour
                         AsyncOperationDetour.additionalLevels.Enqueue("WinterSignupPackPrefabs");
                     }
                 }
-                AsyncOperationDetour.additionalLevels.Enqueue(EuroBuildingsUnlocker._nativeLevelName);
+                AsyncOperationDetour.additionalLevels.Enqueue(Levels.GetNativeLevel());
                 return asyncOperation;
             }
             finally

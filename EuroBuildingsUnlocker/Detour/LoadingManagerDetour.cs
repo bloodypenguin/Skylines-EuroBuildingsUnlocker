@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Reflection;
 using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
 
@@ -9,6 +8,8 @@ namespace EuroBuildingsUnlocker.Detour
     [TargetType(typeof(LoadingManager))]
     public class LoadingManagerDetour : LoadingManager
     {
+        public static Action<GameObject, DistrictStyle, bool> addChildrenToBuiltinStyleHook = null;
+
 
         [RedirectMethod]
         private void AddChildrenToBuiltinStyle(GameObject obj, DistrictStyle style, bool spawnNormally)
@@ -16,31 +17,7 @@ namespace EuroBuildingsUnlocker.Detour
             if ((UnityEngine.Object)obj == (UnityEngine.Object)null || style == null)
                 return;
             //begin mod
-            if (EuroBuildingsUnlocker._extraBuildings != null)
-            {
-                if (spawnNormally)
-                {
-                    foreach (var building in EuroBuildingsUnlocker._extraBuildings.m_prefabs
-                        .Where(building => building.m_class.m_subService != ItemClass.SubService.ResidentialHigh &&
-                        building.m_class.m_subService != ItemClass.SubService.CommercialHigh &&
-                        building.m_class.m_service != ItemClass.Service.Office))
-                    {
-                        style.Add(building);
-                        building.m_dontSpawnNormally = false;
-                    }
-                }
-                else
-                {
-                    foreach (var building in EuroBuildingsUnlocker._extraBuildings.m_prefabs
-                        .Where(building => building.m_class.m_subService == ItemClass.SubService.ResidentialHigh ||
-                        building.m_class.m_subService == ItemClass.SubService.CommercialHigh ||
-                        building.m_class.m_service == ItemClass.Service.Office))
-                    {
-                        style.Add(building);
-                        building.m_dontSpawnNormally = true;
-                    }
-                }
-            }
+            addChildrenToBuiltinStyleHook?.Invoke(obj, style, spawnNormally);
             //end mod
             foreach (BuildingCollection buildingCollection in obj.GetComponentsInChildren<BuildingCollection>(true))
             {
