@@ -36,7 +36,7 @@ namespace EuroBuildingsUnlocker
         {
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log("EuroBuildingsUnlocker - ResetNativeLevel native level name");
+                Debug.Log("EuroBuildingsUnlocker - Reset native level name");
             }
             _nativeLevelName = null;
         }

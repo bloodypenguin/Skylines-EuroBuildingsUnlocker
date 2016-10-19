@@ -49,6 +49,12 @@ namespace EuroBuildingsUnlocker
             _bootstrapped = true;
         }
 
+        public override void OnLevelUnloading()
+        {
+            base.OnLevelUnloading();
+            Levels.ResetNativeLevel();
+        }
+
         public override void OnReleased()
         {
             base.OnReleased();
