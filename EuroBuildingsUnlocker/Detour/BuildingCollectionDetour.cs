@@ -113,7 +113,7 @@ namespace EuroBuildingsUnlocker.Detour
                     foreach (var building in this.m_prefabs)
                     {
                         var isHdGrowable = Util.IsHdGrowable(building);
-                        if (spawnNormally || isHdGrowable)
+                        if (spawnNormally || !isHdGrowable)
                         {
                             continue;
                         }
