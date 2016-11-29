@@ -12,6 +12,6 @@ namespace EuroBuildingsUnlocker
 
         public string Name => "EuropeanBuildingsUnlocker";
 
-        public string Description => "Unlocks European buildings (growables and ploppables) for all environments & vice versa";
+        public string Description => "Unlocks European ploppable buildings for all environments & vice versa";
     }
 }
