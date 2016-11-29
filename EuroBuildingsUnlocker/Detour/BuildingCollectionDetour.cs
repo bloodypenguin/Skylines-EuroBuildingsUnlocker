@@ -28,7 +28,7 @@ namespace EuroBuildingsUnlocker.Detour
             {
                 if (Levels.IsNativeLevelEuropean())
                 {
-                    if (!IsIntUniquePloppable && GameObjectName != Constants.ExtraBuildings)
+                    if (!IsIntUniquePloppable)
                     {
                         Destroy(this);
                         return;
@@ -36,10 +36,6 @@ namespace EuroBuildingsUnlocker.Detour
                     if (GameObjectName == Constants.Education || GameObjectName == Constants.HealthCare)
                     {
                         FixReplaces();
-                    }
-                    if (GameObjectName == Constants.ExtraBuildings)
-                    {
-                        ManageExtraBuildings();
                     }
                 }
             }
@@ -102,34 +98,6 @@ namespace EuroBuildingsUnlocker.Detour
             m_prefabs = prefabsOriginal;
 
         }
-
-        private void ManageExtraBuildings()
-        {
-            var vanillaStyle = PackageManager.FindAssetByName("System." + DistrictStyle.kEuropeanStyleName);
-            if (vanillaStyle != null && vanillaStyle.isEnabled)
-            {
-                LoadingManagerDetour.addChildrenToBuiltinStyleHook = (go, style, spawnNormally) =>
-                {
-                    foreach (var building in this.m_prefabs)
-                    {
-                        var isHdGrowable = Util.IsHdGrowable(building);
-                        if (spawnNormally || !isHdGrowable)
-                        {
-                            continue;
-                        }
-                        style.Add(building);
-                        building.m_dontSpawnNormally = true;
-                    }
-                    LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
-                };
-            }
-            else
-            {
-                LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
-                m_prefabs = m_prefabs.Where(p => !Util.IsHdGrowable(p)).ToArray();
-            }
-        }
-
 
         private void ResolvePreorderPackConflicts()
         {

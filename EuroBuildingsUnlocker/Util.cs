@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using ColossalFramework;
+using ColossalFramework.PlatformServices;
 using ColossalFramework.Plugins;
-using ColossalFramework.Steamworks;
 using ICities;
 using UnityEngine;
 
@@ -9,22 +9,6 @@ namespace EuroBuildingsUnlocker
 {
     public static class Util
     {
-        public static void NullifyEnvironmentVariable()
-        {
-            var simulationManager = Singleton<SimulationManager>.instance;
-            var mMetaData = simulationManager?.m_metaData;
-            if (mMetaData != null)
-            {
-                mMetaData.m_environment = null;
-            }
-        }
-
-        public static bool IsHdGrowable(BuildingInfo building)
-        {
-            return building.m_class.m_subService == ItemClass.SubService.ResidentialHigh ||
-                   building.m_class.m_subService == ItemClass.SubService.CommercialHigh ||
-                   building.m_class.m_service == ItemClass.Service.Office;
-        }
 
         public static bool IsCollectionEuropean(this Component component)
         {
@@ -54,19 +38,14 @@ namespace EuroBuildingsUnlocker
             return component?.gameObject?.name == "Expansion 1";
         }
 
-        public static bool IsPreorderPackInstalled()
-        {
-            return Steam.IsDlcInstalled(340160U);
-        }
-
         public static bool IsSnowfallInstalled()
         {
-            return Steam.IsDlcInstalled(420610U);
+            return PlatformService.IsDlcInstalled((uint)SteamHelper.DLC.SnowFallDLC);
         }
 
         public static bool IsAfterDarkInstalled()
         {
-            return Steam.IsDlcInstalled(369150U);
+            return PlatformService.IsDlcInstalled((uint)SteamHelper.DLC.AfterDarkDLC);
         }
 
         private static string ParentName(Component component)

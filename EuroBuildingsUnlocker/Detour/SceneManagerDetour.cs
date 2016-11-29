@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace EuroBuildingsUnlocker.Detour
 {
-    [TargetType(typeof(Application))]
-    public class ApplicationDetour
+    [TargetType(typeof(SceneManager))]
+    public class SceneManagerDetour
     {
         private static readonly object Lock = new object();
         private static RedirectCallsState _tempState;
@@ -19,7 +21,7 @@ namespace EuroBuildingsUnlocker.Detour
             {
                 return;
             }
-            _redirects = RedirectionUtil.RedirectType(typeof(ApplicationDetour));
+            _redirects = RedirectionUtil.RedirectType(typeof(SceneManagerDetour));
         }
         public static void Revert()
         {
@@ -61,11 +63,12 @@ namespace EuroBuildingsUnlocker.Detour
         }
 
         [RedirectMethod]
-        public static AsyncOperation LoadLevelAdditiveAsync(string levelName)
+        public static AsyncOperation LoadSceneAsync(string levelName, LoadSceneMode mode)
         {
             if (EuroBuildingsUnlocker.debug)
             {
-                Debug.Log($"EuroBuildingsUnlocker - ApplicationDetour - level {levelName} loading was demanded");
+                Debug.Log($"EuroBuildingsUnlocker - SceneManagerDetour - level '{levelName}' loading was demanded. Mode: {mode}" +
+                          $"\nStack trace:\n{Environment.StackTrace}");
             }
             Monitor.Enter(Lock);
             try
@@ -80,9 +83,9 @@ namespace EuroBuildingsUnlocker.Detour
                 }
                 if (EuroBuildingsUnlocker.debug)
                 {
-                    Debug.Log($"EuroBuildingsUnlocker - ApplicationDetour - Loading level {levelName}");
+                    Debug.Log($"EuroBuildingsUnlocker - SceneManagerDetour - Loading level '{levelName}'");
                 }
-                var asyncOperation = Application.LoadLevelAdditiveAsync(levelName);
+                var asyncOperation = SceneManager.LoadSceneAsync(levelName, mode);
                 if (!isNativeLevel)
                 {
                     return asyncOperation;
@@ -101,10 +104,7 @@ namespace EuroBuildingsUnlocker.Detour
                         {
                             AsyncOperationDetour.additionalLevels.Enqueue("Expansion1Prefabs");
                         }
-                        if (Util.IsPreorderPackInstalled())
-                        {
-                            AsyncOperationDetour.additionalLevels.Enqueue("PreorderPackPrefabs");
-                        }
+                        AsyncOperationDetour.additionalLevels.Enqueue("PreorderPackPrefabs");
                         AsyncOperationDetour.additionalLevels.Enqueue("SignupPackPrefabs");
                     }
                 }

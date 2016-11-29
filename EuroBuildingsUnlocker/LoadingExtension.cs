@@ -27,9 +27,8 @@ namespace EuroBuildingsUnlocker
                 }
                 return;
             }
-            Util.NullifyEnvironmentVariable();
             Levels.ResetNativeLevel();
-            ApplicationDetour.Deploy();
+            SceneManagerDetour.Deploy();
             AsyncOperationDetour.Deploy();
             Redirector<BuildingCollectionDetour>.Deploy();
             Redirector<PropCollectionDetour>.Deploy();
@@ -70,9 +69,8 @@ namespace EuroBuildingsUnlocker
                 }
                 return;
             }
-            Util.NullifyEnvironmentVariable();
             Levels.ResetNativeLevel();
-            ApplicationDetour.Revert();
+            SceneManagerDetour.Revert();
             AsyncOperationDetour.Revert();
             Redirector<BuildingCollectionDetour>.Revert();
             Redirector<PropCollectionDetour>.Revert();

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Threading;
 using EuroBuildingsUnlocker.Redirection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace EuroBuildingsUnlocker.Detour
 {
@@ -92,9 +93,9 @@ namespace EuroBuildingsUnlocker.Detour
                                 var additionalLevel = additionalLevels.Dequeue();
                                 if (EuroBuildingsUnlocker.debug)
                                 {
-                                    Debug.Log($"EuroBuildingsUnlocker - AsyncOperationDetour - Loading level {additionalLevel}");
+                                    Debug.Log($"EuroBuildingsUnlocker - AsyncOperationDetour - Loading level '{additionalLevel}'");
                                 }
-                                nativeLevelOperation_addition = Application.LoadLevelAdditiveAsync(additionalLevel);
+                                nativeLevelOperation_addition = SceneManager.LoadSceneAsync(additionalLevel, LoadSceneMode.Additive);
                                 result = false;
                             }
                             else

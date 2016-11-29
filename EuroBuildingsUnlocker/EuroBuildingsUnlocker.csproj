@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
-    <Compile Include="Detour\ApplicationDetour.cs" />
+    <Compile Include="Detour\SceneManagerDetour.cs" />
     <Compile Include="Detour\AsyncOperationDetour.cs" />
     <Compile Include="Detour\BuildingCollectionDetour.cs" />
     <Compile Include="Detour\BuildingCommonCollectionDetour.cs" />
