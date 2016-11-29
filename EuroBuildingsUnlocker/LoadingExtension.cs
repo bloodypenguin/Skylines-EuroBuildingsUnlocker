@@ -44,6 +44,9 @@ namespace EuroBuildingsUnlocker
             Redirector<DistrictPolicyCollectionDetour>.Deploy();
             Redirector<BuildingCommonCollectionDetour>.Deploy();
             Redirector<LoadingManagerDetour>.Deploy();
+            Redirector<RadioContentCollectionDetour>.Deploy();
+            Redirector<RadioChannelCollectionDetour>.Deploy();
+            Redirector<DisasterCollectionDetour>.Deploy();
             LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
             _bootstrapped = true;
         }
@@ -86,6 +89,9 @@ namespace EuroBuildingsUnlocker
             Redirector<DistrictPolicyCollectionDetour>.Revert();
             Redirector<BuildingCommonCollectionDetour>.Revert();
             Redirector<LoadingManagerDetour>.Revert();
+            Redirector<RadioContentCollectionDetour>.Revert();
+            Redirector<RadioChannelCollectionDetour>.Revert();
+            Redirector<DisasterCollectionDetour>.Revert();
             LoadingManagerDetour.addChildrenToBuiltinStyleHook = null;
             _bootstrapped = false;
         }

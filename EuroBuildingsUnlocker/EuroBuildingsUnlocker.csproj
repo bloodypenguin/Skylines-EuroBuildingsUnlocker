@@ -34,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Detour\DisasterCollectionDetour.cs" />
+    <Compile Include="Detour\RadioChannelCollectionDetour.cs" />
+    <Compile Include="Detour\RadioContentCollectionDetour.cs" />
     <Compile Include="Detour\SceneManagerDetour.cs" />
     <Compile Include="Detour\AsyncOperationDetour.cs" />
     <Compile Include="Detour\BuildingCollectionDetour.cs" />
